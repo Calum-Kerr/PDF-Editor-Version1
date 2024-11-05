@@ -1,3 +1,3 @@
 from app import app
-@app.routes('/')
+@app.route('/')
 def hello(): return 'hello world!'
