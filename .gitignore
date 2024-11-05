@@ -1,6 +1,43 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,flask,visualstudiocode,git
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,flask,visualstudiocode,git
 
+# Environment Variables
+.env
+
+# Logs Directory
+logs/
+*.log
+
+# Compiled Python Files
+*.pyc
+*.pyo
+__pycache__/
+
+# IDE and Editor Settings
+# PyCharm and JetBrains IDEs
+.idea/
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Coverage Reports and Test Cache
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.hypothesis/
+
+# Docker
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# mypy
+.mypy_cache/
+
+# Heroku
+.heroku/
+
 ### Flask ###
 instance/*
 !instance/.gitignore
