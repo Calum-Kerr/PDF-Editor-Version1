@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Upload PDF - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Upload Your PDF</h1>
+    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="pdf" accept=".pdf">
+        <button type="submit">Upload</button>
+    </form>
+{% endblock %}
