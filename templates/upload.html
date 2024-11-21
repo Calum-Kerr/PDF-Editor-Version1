@@ -2,8 +2,31 @@
 {% block title %}Upload PDF - RevisePDF{% endblock %}
 {% block content %}
     <h1>Upload Your PDF</h1>
-    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-        <input type="file" name="pdf" accept=".pdf">
-        <button type="submit">Upload</button>
-    </form>
+    <!-- https://www.w3schools.com/html/html5_draganddrop.asp -> helped to make a simple drag and drop-->
+     <!-- https://jsbin.com/hiqasek/edit?html,js,output -> helped to show the file name when dropped and to help design it-->
+      <!-- https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API -> helped to make the drop effect-->
+    <div id="drop-area" style="border: 2px dashed #ccc">
+        <p>Drag and drop your PDF here or click to select</p>
+        <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+            <input type="file" id="fileElem" name="pdf" accept=".pdf" style="display:none" onchange="handleFiles(this.files)">
+            <button type="button" onclick="document.getElementById('fileElem').click()">Select a file</button>
+            <div id="file-name"></div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    <script>
+        var dropArea = document.getElementById('drop-area');
+
+        var fileNameDisplay = document.getElementById('file-name');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(event) {dropArea.addEventListener(event, preventDefault, false);});
+
+        function preventDefault(e){e.preventDefault(); e.stopPropagation();}
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e){var dt = e.dataTransfer; var files = dt.files; handleFiles(files);}
+
+        function handleFiles(files){if (files.length > 0){document.getElementById('fileElem').files = files; fileNameDisplay.textContent = 'Selected file: ' + files[0].name;}}
+    </script>
 {% endblock %}

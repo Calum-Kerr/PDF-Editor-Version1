@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Edit PDF - RevisePDF{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1>Edit PDF</h1>
+        <div class="pdf-container">
+            <embed src="{{ url_for('static', filename='uploads/' + filename) }}" type="application/pdf" width="100%" height="600px" />
+        </div>
+    </div>
+    <style>
+    .container {padding: 20px;}
+    .pdf-container {margin: 20px 0; border: 1px solid #ccc;}
+    .editing-tools {margin-top: 20px;}
+    .btn {margin-right: 10px;}
+    </style>
+{% endblock %}
