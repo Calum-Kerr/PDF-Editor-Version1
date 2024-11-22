@@ -95,5 +95,3 @@ def save_changes(filename):
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
-    doc.close()
-    return render_template('edit.html', filename=filename, text_blocks=text_blocks)
