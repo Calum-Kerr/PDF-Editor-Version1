@@ -1,12 +1,11 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 from app import app
+from io import BytesIO
 import os
- 
-UPLOAD_FOLDER = 'app/static/uploads'
-MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16mb limit and it works perfectly fine with a 15mb file!
+import fitz
 
-def allowed_file(filename):return filename.lower().endswith('.pdf')
+UPLOAD_FOLDER = 'app/static/uploads'
 
 @app.route('/')
 def index():return render_template('index.html')
@@ -22,19 +21,79 @@ def upload():
         if 'pdf' not in request.files:
             return redirect('/upload')
         file = request.files['pdf']
-        if file.filename == '' or not allowed_file(file.filename):
+        if file.filename == '': 
             return redirect('/upload')
-        try:
+        if file and file.filename.endswith('.pdf'):
             filename = secure_filename(file.filename)
             if not os.path.exists(UPLOAD_FOLDER):
                 os.makedirs(UPLOAD_FOLDER)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             return redirect('/edit/' + filename)
-        except:return redirect('/upload')
+    return redirect('/upload')
 
 @app.route('/edit/<filename>')
 def edit_pdf(filename):
-    file_path = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
-    if not os.path.exists(file_path):
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
+        if not os.path.exists(file_path):
+            return redirect('/upload')
+            
+        text_blocks = []
+        doc = fitz.open(file_path)
+        
+        for page_num in range(len(doc)):
+            page = doc[page_num]
+            blocks = page.get_text("dict")["blocks"]
+            
+            for block in blocks:
+                if "lines" in block:
+                    for line in block["lines"]:
+                        for span in line["spans"]:
+                            text_blocks.append({
+                                'page': page_num,
+                                'bbox': span['bbox'],
+                                'text': span['text'],
+                                'font': span['font'],
+                                'size': span['size']})
+        doc.close()
+        return render_template('edit.html', filename=filename, text_blocks=text_blocks)
+    except Exception as e:
+        print(f"Error in edit_pdf: {str(e)}")
         return redirect('/upload')
-    return render_template('edit.html', filename=filename)
+
+@app.route('/save_changes/<filename>', methods=['POST'])
+def save_changes(filename):
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, secure_filename(filename))
+        changes = request.get_json()['changes']
+        doc = fitz.open(file_path)
+        for change in changes:
+            page = doc[int(change['page'])]
+            bbox = fitz.Rect(change['bbox'])
+            page.add_redact_annot(bbox)
+            page.apply_redactions()
+            page.insert_textbox(
+                rect=bbox,
+                buffer=change['text'],
+                fontsize=change['size'],
+                fontname=change['font'],
+                color=(0, 0, 0))
+        modified_path = os.path.join(UPLOAD_FOLDER, f'modified_{filename}')
+        doc.save(modified_path)
+        doc.close()
+        return send_file(
+            modified_path,
+            as_attachment=True,
+            download_name=f'modified_{filename}',
+            mimetype='application/pdf'
+        )
+    
+    except Exception as e:
+        print(f"Error saving PDF: {str(e)}")
+        return {'error': str(e)}, 500
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    doc.close()
+    return render_template('edit.html', filename=filename, text_blocks=text_blocks)
