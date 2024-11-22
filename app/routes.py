@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from app import app
 from io import BytesIO
 import os
+import logging
 import fitz
 
 UPLOAD_FOLDER = 'app/static/uploads'
@@ -71,13 +72,14 @@ def save_changes(filename):
             page = doc[int(change['page'])]
             bbox = fitz.Rect(change['bbox'])
             page.add_redact_annot(bbox)
-            page.apply_redactions()
             page.insert_textbox(
                 rect=bbox,
                 buffer=change['text'],
                 fontsize=change['size'],
                 fontname=change['font'],
                 color=(0, 0, 0))
+        for page in doc:
+            page.apply_redactions()
         modified_path = os.path.join(UPLOAD_FOLDER, f'modified_{filename}')
         doc.save(modified_path)
         doc.close()
@@ -94,4 +96,9 @@ def save_changes(filename):
 
 @app.route('/download/<filename>')
 def download_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    try:
+        logging.info(f"Attempting to download file: {filename}")
+        return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    except Exception as e:
+        logging.error(f"Error downloading file: {str(e)}")
+        return {'error': str(e)}, 500
