@@ -1,7 +1,89 @@
 {% extends 'base.html' %}
-{% block title %}RevisePDF{% endblock %}
+{% block title %}RevisePDF - Home{% endblock %}
 {% block content %}
     <h1>Welcome to RevisePDF!</h1>
     <p>Revise, edit, and enhance your PDFs with ease.</p>
-    <a href="{{ url_for('upload') }}">Get Started</a>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Optimise</h5>
+                    <p class="card-text">Compress, repair, or OCR your PDFs.</p>
+                    <a href="{{ url_for('optimise') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Convert</h5>
+                    <p class="card-text">Convert PDFs to or from other formats.</p>
+                    <a href="{{ url_for('convert') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Edit</h5>
+                    <p class="card-text">Edit content, add watermarks, and more.</p>
+                    <a href="{{ url_for('edit') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Organise</h5>
+                    <p class="card-text">Merge, split, sort, and manage your PDFs.</p>
+                    <a href="{{ url_for('organise') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Security</h5>
+                    <p class="card-text">Unlock, protect, sign, and redact PDFs.</p>
+                    <a href="{{ url_for('security') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Creative</h5>
+                    <p class="card-text">Design, customise, add flair to your PDFs.</p>
+                    <a href="{{ url_for('creative') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Accessibility</h5>
+                    <p class="card-text">Improve usability and inclusivity for your PDFs.</p>
+                    <a href="{{ url_for('accessibility') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Developer & Professional</h5>
+                    <p class="card-text">Advanced tools for developers and professionals.</p>
+                    <a href="{{ url_for('developer') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Analysis & Utilities</h5>
+                    <p class="card-text">Analyse and enhance your PDFs with smart tools.</p>
+                    <a href="{{ url_for('analysis') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

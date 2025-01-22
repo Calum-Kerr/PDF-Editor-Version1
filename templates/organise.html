@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Organise - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Organise Your PDF</h1>
+    <p>Choose from the tools below to organise and manage your PDF files.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Merge PDFs</h5>
+                    <p class="card-text">Combine multiple PDF files into one document.</p>
+                    <a href="/pages/organise/merge" class="btn btn-primary mt-auto">Merge</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Split PDF</h5>
+                    <p class="card-text">Separate a PDF into multiple smaller files.</p>
+                    <a href="/pages/organise/split" class="btn btn-primary mt-auto">Split</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Remove Pages</h5>
+                    <p class="card-text">Delete specific pages from your PDF document.</p>
+                    <a href="/pages/organise/remove" class="btn btn-primary mt-auto">Remove Pages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Extract Pages</h5>
+                    <p class="card-text">Extract specific pages into a new PDF file.</p>
+                    <a href="/pages/organise/extract" class="btn btn-primary mt-auto">Extract Pages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Sort Pages</h5>
+                    <p class="card-text">Reorder pages within your PDF document.</p>
+                    <a href="/pages/organise/sort" class="btn btn-primary mt-auto">Sort Pages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Rotate Pages</h5>
+                    <p class="card-text">Rotate specific pages within your PDF document.</p>
+                    <a href="/pages/organise/rotate" class="btn btn-primary mt-auto">Rotate Pages</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

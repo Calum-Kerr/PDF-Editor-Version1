@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Accessibility - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Enhance PDF Accessibility</h1>
+    <p>Choose from the tools below to improve usability and inclusivity for your PDF files.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Add Tags</h5>
+                    <p class="card-text">Add metadata tags to improve PDF accessibility.</p>
+                    <a href="/pages/accessibility/add_tags" class="btn btn-primary mt-auto">Add Tags</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Accessibility Checker</h5>
+                    <p class="card-text">Evaluate your PDF's compliance with accessibility standards.</p>
+                    <a href="/pages/accessibility/accessibility_checker" class="btn btn-primary mt-auto">Check Accessibility</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Read Aloud</h5>
+                    <p class="card-text">Enable text-to-speech for reading PDF content aloud.</p>
+                    <a href="/pages/accessibility/read_aloud" class="btn btn-primary mt-auto">Read Aloud</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

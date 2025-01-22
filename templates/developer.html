@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Developer & Professional - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Developer & Professional Tools</h1>
+    <p>Choose from the tools below for advanced PDF management and development.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Code to Flowchart</h5>
+                    <p class="card-text">Generate flowcharts directly from code within PDFs.</p>
+                    <a href="/pages/developer/code_to_flowchart" class="btn btn-primary mt-auto">Generate Flowchart</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Layer Viewer</h5>
+                    <p class="card-text">Inspect and manage layers in your PDFs.</p>
+                    <a href="/pages/developer/layer_viewer" class="btn btn-primary mt-auto">View Layers</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Map Extractor</h5>
+                    <p class="card-text">Extract maps and geographic data from PDFs.</p>
+                    <a href="/pages/developer/map_extractor" class="btn btn-primary mt-auto">Extract Maps</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Metadata Cleaner</h5>
+                    <p class="card-text">Clean and manage metadata in your PDFs.</p>
+                    <a href="/pages/developer/metadata_cleaner" class="btn btn-primary mt-auto">Clean Metadata</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

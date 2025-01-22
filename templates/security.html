@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Security - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Secure Your PDF</h1>
+    <p>Choose from the tools below to secure and manage your PDF files.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Unlock PDF</h5>
+                    <p class="card-text">Remove password protection from your PDF.</p>
+                    <a href="/pages/security/unlock" class="btn btn-primary mt-auto">Unlock</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Protect PDF</h5>
+                    <p class="card-text">Add password protection to your PDF file.</p>
+                    <a href="/pages/security/protect" class="btn btn-primary mt-auto">Protect</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Sign PDF</h5>
+                    <p class="card-text">Add a digital signature to your PDF document.</p>
+                    <a href="/pages/security/sign" class="btn btn-primary mt-auto">Sign</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Compare PDFs</h5>
+                    <p class="card-text">Compare the content of two PDF files.</p>
+                    <a href="/pages/security/compare" class="btn btn-primary mt-auto">Compare</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Redact PDF</h5>
+                    <p class="card-text">Permanently remove sensitive content from your PDF.</p>
+                    <a href="/pages/security/redact" class="btn btn-primary mt-auto">Redact</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Flatten PDF</h5>
+                    <p class="card-text">Flatten your PDF to prevent further editing.</p>
+                    <a href="/pages/security/flatten" class="btn btn-primary mt-auto">Flatten</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

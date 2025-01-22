@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Analysis & Utilities - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Analysis & Utilities</h1>
+    <p>Choose from the tools below to analyse and enhance your PDF files with smart tools.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Size Optimiser</h5>
+                    <p class="card-text">Optimise the size of your PDF without compromising quality.</p>
+                    <a href="/pages/analysis/size_optimiser" class="btn btn-primary mt-auto">Optimise</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Snapshot Tool</h5>
+                    <p class="card-text">Capture snapshots of specific PDF pages.</p>
+                    <a href="/pages/analysis/snapshot_tool" class="btn btn-primary mt-auto">Capture</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Task/Checklist Generator</h5>
+                    <p class="card-text">Generate a checklist or task list from your PDF content.</p>
+                    <a href="/pages/analysis/task_generator" class="btn btn-primary mt-auto">Generate</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Research Citation Tool</h5>
+                    <p class="card-text">Extract and format citations from research PDFs.</p>
+                    <a href="/pages/analysis/citation_tool" class="btn btn-primary mt-auto">Extract</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

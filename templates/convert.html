@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Convert - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Convert Your PDF</h1>
+    <p>Choose from the tools below to convert your PDF files to and from different formats.</p>
+
+    <ul class="nav nav-tabs" id="convertTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="convert-to-tab" data-bs-toggle="tab" data-bs-target="#convert-to" type="button" role="tab" aria-controls="convert-to" aria-selected="true">Convert to PDF</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="convert-from-tab" data-bs-toggle="tab" data-bs-target="#convert-from" type="button" role="tab" aria-controls="convert-from" aria-selected="false">Convert from PDF</button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-4" id="convertTabsContent">
+        <div class="tab-pane fade show active" id="convert-to" role="tabpanel" aria-labelledby="convert-to-tab">
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">JPG to PDF</h5>
+                            <p class="card-text">Combine JPG images into a single PDF file.</p>
+                            <a href="/pages/convert/jpg_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">Word to PDF</h5>
+                            <p class="card-text">Transform your Word documents into PDFs.</p>
+                            <a href="/pages/convert/word_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PowerPoint to PDF</h5>
+                            <p class="card-text">Convert your PowerPoint presentations into PDF format.</p>
+                            <a href="/pages/convert/ppt_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">Excel to PDF</h5>
+                            <p class="card-text">Convert your Excel spreadsheets into PDF format.</p>
+                            <a href="/pages/convert/excel_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">HTML to PDF</h5>
+                            <p class="card-text">Transform HTML files into a neatly formatted PDF.</p>
+                            <a href="/pages/convert/html_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">Zip of Images to PDF</h5>
+                            <p class="card-text">Convert a zip of images into a single PDF document.</p>
+                            <a href="/pages/convert/zip_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="convert-from" role="tabpanel" aria-labelledby="convert-from-tab">
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to JPG</h5>
+                            <p class="card-text">Extract high-quality images from your PDF file.</p>
+                            <a href="/pages/convert/pdf_to_jpg" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to Panoramic</h5>
+                            <p class="card-text">Generate a panoramic view from your PDF pages.</p>
+                            <a href="/pages/convert/pdf_to_panoramic" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to Word</h5>
+                            <p class="card-text">Convert PDF files into editable Word documents.</p>
+                            <a href="/pages/convert/pdf_to_word" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to PowerPoint</h5>
+                            <p class="card-text">Convert your PDF into PowerPoint slides.</p>
+                            <a href="/pages/convert/pdf_to_ppt" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to Excel</h5>
+                            <p class="card-text">Extract tables and data from PDFs into Excel spreadsheets.</p>
+                            <a href="/pages/convert/pdf_to_excel" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card" style="height: 100%;">
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title">PDF to PDF/A</h5>
+                            <p class="card-text">Convert your PDF into an archival PDF/A format.</p>
+                            <a href="/pages/convert/pdf_to_pdfa" class="btn btn-primary mt-auto">Convert</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

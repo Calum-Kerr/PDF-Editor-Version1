@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Optimise - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Optimise Your PDF</h1>
+    <p>Choose from the tools below to optimise your PDF files.</p>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Compress PDF</h5>
+                    <p class="card-text">Reduce the size of your PDF for easier sharing.</p>
+                    <a href="/pages/optimise/compress" class="btn btn-primary mt-auto">Compress</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">Repair PDF</h5>
+                    <p class="card-text">Fix corrupted or damaged PDF files.</p>
+                    <a href="/pages/optimise/repair" class="btn btn-primary mt-auto">Repair</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">OCR PDF</h5>
+                    <p class="card-text">Extract text from scanned PDFs.</p>
+                    <a href="/pages/optimise/ocr" class="btn btn-primary mt-auto">OCR</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

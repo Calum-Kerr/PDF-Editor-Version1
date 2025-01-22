@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Creative - RevisePDF{% endblock %}
+{% block content %}
+    <h1>Creative Tools</h1>
+    <p>Choose from the tools below to design, customise, and add flair to your PDFs.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Page Designer</h5>
+                    <p class="card-text">Create and customise the layout of your PDF pages.</p>
+                    <a href="/pages/creative/page_designer" class="btn btn-primary mt-auto">Design Pages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Cover Creator</h5>
+                    <p class="card-text">Design and add covers to your PDF documents.</p>
+                    <a href="/pages/creative/cover_creator" class="btn btn-primary mt-auto">Create Cover</a>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="height: 100%;">
+                <div class="card-body text-center d-flex flex-column justify-content-between">
+                    <h5 class="card-title">PDF Watermark Designer</h5>
+                    <p class="card-text">Customise and design watermarks for your PDFs.</p>
+                    <a href="/pages/creative/watermark_designer" class="btn btn-primary mt-auto">Design Watermark</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
