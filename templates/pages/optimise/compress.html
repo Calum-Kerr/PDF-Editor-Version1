@@ -1,31 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}Compress PDF - RevisePDF{% endblock %}
 {% block content %}
-<h1>Compress PDF</h1>
-<p>Use this tool to reduce the size of your PDF files for easier sharing and storage.</p>
-
-<!-- File Upload Form -->
-<form id="compress-form" method="post" enctype="multipart/form-data">
-    <div class="mb-3">
-        <label for="pdfFile" class="form-label">Upload your PDF</label>
-        <input class="form-control" type="file" id="pdfFile" name="pdfFile" accept="application/pdf" required>
-    </div>
-    <div class="mb-3">
-        <label for="compressionLevel" class="form-label">Select Compression Level</label>
-        <select class="form-select" id="compressionLevel" name="compressionLevel" required>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Compress</button>
+<form method="POST" enctype="multipart/form-data">
+  <label for="pdf_file">Upload a PDF:</label>
+  <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required>
+  <button type="submit">Download PDF</button>
 </form>
-
-<!-- Compressed File Download -->
-{% if compressed_file %}
-<div class="mt-4">
-    <h5>Download Your Compressed PDF</h5>
-    <a href="/compressed/{{ compressed_file }}" class="btn btn-success">Download PDF</a>
-</div>
-{% endif %}
 {% endblock %}

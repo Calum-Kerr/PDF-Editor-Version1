@@ -5,6 +5,8 @@ from io import BytesIO
 import os
 import fitz
 
+from tools.optimise.compress import compress_view
+
 #------------------------- Main Pages -------------------------
 
 @app.route('/')
@@ -242,6 +244,12 @@ def redact():
 @app.route('/pages/security/flatten')
 def flatten():
     return render_template('pages/security/flatten.html')
+
+#------------------------- File Uploads -------------------------
+
+@app.route('/pages/optimise/compress', methods=['GET', 'POST'], endpoint='compress_pdf')
+def compress():
+    return compress_view()
 
 if __name__ == "__main__":
     app.run(debug=True)
