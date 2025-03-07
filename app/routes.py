@@ -6,6 +6,7 @@ import os
 import fitz
 
 from tools.optimise.compress import compress_view
+from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 
 #------------------------- Main Pages -------------------------
 
@@ -119,9 +120,9 @@ def zip_to_pdf():
 def pdf_to_jpg():
     return render_template('pages/convert/pdf_to_jpg.html')
 
-@app.route('/pages/convert/pdf_to_panoramic')
+@app.route('/pages/convert/pdf_to_panoramic', methods=['GET', 'POST'])
 def pdf_to_panoramic():
-    return render_template('pages/convert/pdf_to_panoramic.html')
+    return pdf_to_panoramic_view()
 
 @app.route('/pages/convert/pdf_to_word')
 def pdf_to_word():
