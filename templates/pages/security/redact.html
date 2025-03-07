@@ -1,6 +1,816 @@
 {% extends 'base.html' %}
 {% block title %}Redact PDF - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Redact PDF</h1>
-    <p>Permanently remove sensitive content from your PDF.</p>
+    <div class="container-fluid mt-3 px-4">
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+        
+        {% if not pdf_path %}
+        <!-- Initial file upload form in a centered card -->
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Redact PDF</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Permanently remove sensitive text or images from your PDF documents.</p>
+                        <form method="POST" enctype="multipart/form-data" id="upload-form">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Select PDF to Redact</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                                <div class="form-text">
+                                    Your PDF will be processed securely. After redaction, sensitive content will be permanently removed.
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Upload PDF</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <h5>About PDF Redaction</h5>
+                        <ul>
+                            <li>Draw rectangles over sensitive content you want to remove</li>
+                            <li>The "Auto-Detect Text" feature helps identify text blocks</li>
+                            <li>All content under redacted areas will be permanently removed</li>
+                            <li>Metadata is also cleaned during the redaction process</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Full-page redaction interface with full-page PDF display -->
+        <div id="redaction-interface" class="row">
+            <!-- PDF Viewer - Takes most of the screen with full page display -->
+            <div class="col-md-10 pdf-viewer-container">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h4>Redacting: <span id="current-filename">{{ filename }}</span></h4>
+                    <div class="pdf-navigation">
+                        <button id="prev-page" class="btn btn-sm btn-secondary me-2">Previous Page</button>
+                        <span id="page-info">Page <span id="current-page">1</span> of <span id="total-pages">?</span></span>
+                        <button id="next-page" class="btn btn-sm btn-secondary ms-2">Next Page</button>
+                    </div>
+                </div>
+                
+                <div class="pdf-container border" style="position: relative; background-color: #f0f0f0; height: calc(100vh - 130px); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <div id="canvas-container" style="position: relative; max-width: 100%; max-height: 100%;">
+                        <canvas id="pdf-canvas" style="border:1px solid #ddd; display: block; max-width: 100%; max-height: 100%;"></canvas>
+                        <canvas id="redaction-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+                        <div id="drawing-mode" style="position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.7); padding: 5px; border-radius: 5px; z-index: 100;">
+                            Selection Mode: <span id="drawing-mode-status">On</span>
+                        </div>
+                        <!-- Small corner preview -->
+                        <div id="redaction-preview" style="position: absolute; bottom: 10px; right: 10px; width: 150px; height: 150px; background: white; border: 1px solid #ccc; border-radius: 4px; padding: 5px; display: none; z-index: 100;">
+                            <h6 class="mb-2">Redaction Effect</h6>
+                            <div id="redaction-preview-content" style="width: 100%; height: 110px; overflow: hidden; position: relative;">
+                                <div style="text-align: center; padding-top: 40px;">No selection</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="page-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.8); padding: 20px; border-radius: 5px; display: none; z-index: 200;">
+                        Loading page...
+                    </div>
+                </div>
+                
+                <!-- Important warning at bottom of viewer -->
+                <div class="alert alert-warning mt-2">
+                    <strong>Important:</strong> Redaction permanently removes the selected content from your PDF. 
+                    This process cannot be undone. Preview your selections carefully before applying.
+                </div>
+            </div>
+            
+            <!-- Tools sidebar - Far right and compact -->
+            <div class="col-md-2">
+                <div class="card sticky-top" style="top: 20px; z-index: 100;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Redaction Tools</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="mb-3">
+                            <label class="form-label">Selection Style</label>
+                            <select id="highlight-style" class="form-select form-select-sm">
+                                <option value="highlight" selected>Yellow Highlight</option>
+                                <option value="underline">Red Underline</option>
+                                <option value="outline">Blue Outline</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <button id="toggle-drawing" class="btn btn-outline-secondary btn-sm w-100">Toggle Selection</button>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <button id="clear-current" class="btn btn-outline-warning btn-sm w-100">Clear Current Page</button>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button id="detect-text" class="btn btn-outline-info btn-sm w-100">Auto-Detect Text</button>
+                        </div>
+                        
+                        <hr class="my-2">
+                        
+                        <div class="mb-2">
+                            <h6 class="mb-1">Selected Areas</h6>
+                            <div id="redaction-list" style="max-height: 200px; overflow-y: auto; font-size: 0.7rem;">
+                                <div class="text-muted">No selections yet</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="show-preview" checked>
+                            <label class="form-check-label" for="show-preview">
+                                Show preview
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-3">
+                            <button id="apply-redactions" class="btn btn-danger btn-sm">Apply Redactions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden form for redaction submission -->
+            <form id="redaction-form" style="display: none;">
+                <input type="hidden" id="pdf-path" name="pdf_path" value="{{ pdf_path }}">
+                <input type="hidden" id="redaction-data" name="redaction_data">
+                <input type="hidden" id="original-filename" name="filename" value="{{ filename }}">
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if pdf_path %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store redaction areas for each page
+            const redactionAreas = {};
+            let currentPage = 0;
+            let totalPages = 0;
+            
+            // Get PDF path from template
+            let pdfPath = '{{ pdf_path }}';
+            let originalFilename = '{{ filename }}';
+            let zoom = 1.0;  // This will be calculated dynamically
+            let originalWidth = 0;
+            let originalHeight = 0;
+            let scale = 1.0;  // Scale factor for fitting to screen
+            
+            // Elements
+            const pdfCanvas = document.getElementById('pdf-canvas');
+            const redactionCanvas = document.getElementById('redaction-canvas');
+            const canvasContainer = document.getElementById('canvas-container');
+            const pageLoading = document.getElementById('page-loading');
+            const prevPageBtn = document.getElementById('prev-page');
+            const nextPageBtn = document.getElementById('next-page');
+            const currentPageEl = document.getElementById('current-page');
+            const totalPagesEl = document.getElementById('total-pages');
+            const redactionList = document.getElementById('redaction-list');
+            const applyRedactionsBtn = document.getElementById('apply-redactions');
+            const toggleDrawingBtn = document.getElementById('toggle-drawing');
+            const clearCurrentBtn = document.getElementById('clear-current');
+            const detectTextBtn = document.getElementById('detect-text');
+            const highlightStyleSelect = document.getElementById('highlight-style');
+            const drawingModeStatus = document.getElementById('drawing-mode-status');
+            const showPreviewCheckbox = document.getElementById('show-preview');
+            const redactionPreview = document.getElementById('redaction-preview');
+            const redactionPreviewContent = document.getElementById('redaction-preview-content');
+            
+            // Canvas contexts
+            const pdfCtx = pdfCanvas.getContext('2d');
+            const redactionCtx = redactionCanvas.getContext('2d');
+            
+            // Drawing state
+            let isDrawing = false;
+            let drawingMode = true;
+            let startX, startY;
+            let highlightStyle = 'highlight';  // Default style
+            
+            // Initialize UI
+            function init() {
+                // Load first page
+                loadPage(0);
+                
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Initialize drawing state display
+                updateDrawingModeDisplay();
+                
+                // Initialize preview
+                updatePreviewVisibility();
+                
+                // Handle window resize to adjust canvas size
+                window.addEventListener('resize', resizeCanvas);
+                
+                // Add zoom detection with MutationObserver to handle browser zoom
+                detectZoomChanges();
+            }
+            
+            // Detect zoom changes with MutationObserver
+            function detectZoomChanges() {
+                // Check for zoom changes every second
+                let lastWidth = window.innerWidth;
+                let lastHeight = window.innerHeight;
+                
+                // Check if browser zoom changed by comparing window dimensions ratios
+                setInterval(function() {
+                    // If window size is same but document scale changed, zoom happened
+                    if (window.innerWidth === lastWidth && window.innerHeight === lastHeight) {
+                        // Force canvas redraw when zoom detected
+                        if (originalWidth > 0 && originalHeight > 0) {
+                            resizeCanvas();
+                        }
+                    }
+                    
+                    lastWidth = window.innerWidth;
+                    lastHeight = window.innerHeight;
+                }, 1000);
+                
+                // Also listen for scroll events which might indicate zoom
+                window.addEventListener('wheel', function(e) {
+                    // If Ctrl key was pressed, it's likely a zoom operation
+                    if (e.ctrlKey && originalWidth > 0 && originalHeight > 0) {
+                        // Schedule a resize after zoom completes
+                        setTimeout(resizeCanvas, 100);
+                    }
+                });
+            }
+            
+            // Calculate the best fit for the PDF page
+            function calculateScale(width, height) {
+                const container = document.querySelector('.pdf-container');
+                if (!container) return 1.0;
+                
+                // Get container dimensions with some padding
+                const containerWidth = container.clientWidth - 40; // 20px padding on each side
+                const containerHeight = container.clientHeight - 40;
+                
+                // Calculate scale to fit both dimensions
+                const widthScale = containerWidth / width;
+                const heightScale = containerHeight / height;
+                
+                // Use the smaller scale to ensure the entire page fits
+                return Math.min(widthScale, heightScale);
+            }
+            
+            // Resize canvas to fit the viewport
+            function resizeCanvas() {
+                if (originalWidth === 0 || originalHeight === 0) return;
+                
+                // Recalculate scale
+                scale = calculateScale(originalWidth, originalHeight);
+                
+                // Set canvas dimensions based on the scale
+                const scaledWidth = Math.floor(originalWidth * scale);
+                const scaledHeight = Math.floor(originalHeight * scale);
+                
+                // Make sure we have valid dimensions
+                if (scaledWidth <= 0 || scaledHeight <= 0) {
+                    console.warn("Invalid canvas dimensions calculated, retrying in 500ms");
+                    setTimeout(resizeCanvas, 500);
+                    return;
+                }
+                
+                console.log("Resizing canvas to", scaledWidth, "x", scaledHeight);
+                
+                // Update canvases
+                pdfCanvas.width = scaledWidth;
+                pdfCanvas.height = scaledHeight;
+                redactionCanvas.width = scaledWidth;
+                redactionCanvas.height = scaledHeight;
+                
+                // Update styling to maintain aspect ratio
+                pdfCanvas.style.maxWidth = scaledWidth + 'px';
+                pdfCanvas.style.maxHeight = scaledHeight + 'px';
+                
+                // Force canvas to be visible
+                pdfCanvas.style.display = 'block';
+                
+                // Redraw everything at the new scale
+                if (pdfCanvas._pdfImageData) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Clear both canvases first
+                        pdfCtx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+                        redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                        
+                        // Draw PDF page
+                        pdfCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+                        
+                        // Draw redactions
+                        drawExistingRedactions();
+                    };
+                    img.src = 'data:image/png;base64,' + pdfCanvas._pdfImageData;
+                }
+            }
+            
+            // Load a specific page from the PDF
+            function loadPage(pageNum) {
+                currentPage = pageNum;
+                currentPageEl.textContent = pageNum + 1;  // 1-indexed for display
+                
+                // Show loading indicator
+                pageLoading.style.display = 'block';
+                pageLoading.textContent = 'Loading page...';
+                
+                // Clear canvases
+                clearCanvases();
+                
+                // Request page image from server
+                const formData = new FormData();
+                formData.append('get_page', '1');
+                formData.append('pdf_path', pdfPath);
+                formData.append('page_num', pageNum);
+                
+                fetch('/pages/security/redact', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Store original page dimensions
+                        originalWidth = data.page.width;
+                        originalHeight = data.page.height;
+                        
+                        // Store the image data for later use
+                        pdfCanvas._pdfImageData = data.page.image;
+                        
+                        // Calculate scale to fit the page in the viewport
+                        scale = calculateScale(originalWidth, originalHeight);
+                        
+                        // Calculate display dimensions
+                        const displayWidth = Math.floor(originalWidth * scale);
+                        const displayHeight = Math.floor(originalHeight * scale);
+                        
+                        console.log("Loading page with dimensions:", displayWidth, "x", displayHeight, "scale:", scale);
+                        
+                        // Set canvas size
+                        pdfCanvas.width = displayWidth;
+                        pdfCanvas.height = displayHeight;
+                        redactionCanvas.width = displayWidth;
+                        redactionCanvas.height = displayHeight;
+                        
+                        // Ensure canvas is visible
+                        pdfCanvas.style.display = 'block';
+                        redactionCanvas.style.display = 'block';
+                        
+                        // Create new image for drawing
+                        const img = new Image();
+                        
+                        // Handle image load success
+                        img.onload = function() {
+                            // Draw page image first
+                            pdfCtx.drawImage(img, 0, 0, displayWidth, displayHeight);
+                            
+                            // Draw any existing redaction areas for this page
+                            drawExistingRedactions();
+                            
+                            // Update UI
+                            updateRedactionList();
+                            pageLoading.style.display = 'none';
+                            
+                            // Update preview if there are selections
+                            updateCornerPreview();
+                        };
+                        
+                        // Handle image load error
+                        img.onerror = function() {
+                            console.error("Failed to load PDF image");
+                            pageLoading.textContent = 'Error loading page image';
+                            setTimeout(() => {
+                                pageLoading.style.display = 'none';
+                            }, 3000);
+                        };
+                        
+                        // Start loading the image
+                        img.src = 'data:image/png;base64,' + data.page.image;
+                        
+                        // Update total pages if not set yet
+                        if (totalPages === 0 && data.page.total_pages) {
+                            totalPages = data.page.total_pages;
+                            totalPagesEl.textContent = totalPages;
+                        }
+                    } else {
+                        console.error("Error loading page:", data.message);
+                        pageLoading.textContent = 'Error: ' + data.message;
+                        setTimeout(() => {
+                            pageLoading.style.display = 'none';
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    pageLoading.textContent = 'Network error: ' + error;
+                    setTimeout(() => {
+                        pageLoading.style.display = 'none';
+                    }, 3000);
+                });
+            }
+            
+            // Clear both canvases
+            function clearCanvases() {
+                pdfCtx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+                redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+            }
+            
+            // Draw existing redaction areas for the current page
+            function drawExistingRedactions() {
+                if (!redactionAreas[currentPage]) return;
+                
+                for (const rect of redactionAreas[currentPage]) {
+                    const [x1, y1, x2, y2] = rect;
+                    const width = x2 - x1;
+                    const height = y2 - y1;
+                    
+                    // Draw scaled to match the display size
+                    drawHighlight(x1 * scale, y1 * scale, width * scale, height * scale);
+                }
+            }
+            
+            // Draw highlight based on selected style
+            function drawHighlight(x, y, width, height) {
+                redactionCtx.save();
+                
+                switch (highlightStyle) {
+                    case 'highlight':
+                        // Yellow semi-transparent highlight
+                        redactionCtx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+                        redactionCtx.fillRect(x, y, width, height);
+                        // Red border
+                        redactionCtx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                        redactionCtx.lineWidth = 2;
+                        redactionCtx.strokeRect(x, y, width, height);
+                        break;
+                        
+                    case 'underline':
+                        // Red underline
+                        redactionCtx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                        redactionCtx.lineWidth = 2;
+                        redactionCtx.beginPath();
+                        redactionCtx.moveTo(x, y + height);
+                        redactionCtx.lineTo(x + width, y + height);
+                        redactionCtx.stroke();
+                        // Transparent fill with dashed border
+                        redactionCtx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+                        redactionCtx.fillRect(x, y, width, height);
+                        redactionCtx.setLineDash([5, 3]);
+                        redactionCtx.strokeRect(x, y, width, height);
+                        break;
+                        
+                    case 'outline':
+                        // Blue dashed outline
+                        redactionCtx.strokeStyle = 'rgba(0, 0, 255, 0.7)';
+                        redactionCtx.lineWidth = 2;
+                        redactionCtx.setLineDash([5, 3]);
+                        redactionCtx.strokeRect(x, y, width, height);
+                        // Light blue fill
+                        redactionCtx.fillStyle = 'rgba(0, 0, 255, 0.1)';
+                        redactionCtx.fillRect(x, y, width, height);
+                        break;
+                }
+                
+                redactionCtx.restore();
+            }
+            
+            // Update the corner preview to show what redaction will look like
+            function updateCornerPreview() {
+                if (!showPreviewCheckbox.checked || !redactionAreas[currentPage] || redactionAreas[currentPage].length === 0) {
+                    redactionPreview.style.display = 'none';
+                    return;
+                }
+                
+                redactionPreview.style.display = 'block';
+                
+                // Create a mini canvas for the preview
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 140;
+                previewCanvas.height = 110;
+                const ctx = previewCanvas.getContext('2d');
+                
+                // Draw a white background
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+                
+                // Draw some sample text for demonstration
+                ctx.fillStyle = 'black';
+                ctx.font = '12px Arial';
+                ctx.fillText('This is sample text', 10, 20);
+                ctx.fillText('with some content that', 10, 40);
+                ctx.fillText('will be redacted in the', 10, 60);
+                ctx.fillText('final document.', 10, 80);
+                
+                // Draw the redaction effect - black boxes
+                ctx.fillStyle = 'black';
+                // Redact some of the text as an example
+                ctx.fillRect(10, 8, 140, 16); // "This is sample text"
+                ctx.fillRect(30, 48, 120, 16); // part of "will be redacted"
+                
+                // Add the canvas to the preview
+                redactionPreviewContent.innerHTML = '';
+                redactionPreviewContent.appendChild(previewCanvas);
+                
+                // Add some text to explain
+                const explanation = document.createElement('div');
+                explanation.style.fontSize = '10px';
+                explanation.style.marginTop = '4px';
+                explanation.textContent = 'Final redaction shown in black';
+                redactionPreviewContent.appendChild(explanation);
+            }
+            
+            // Toggle preview visibility
+            function updatePreviewVisibility() {
+                if (showPreviewCheckbox.checked) {
+                    updateCornerPreview();
+                } else {
+                    redactionPreview.style.display = 'none';
+                }
+            }
+            
+            // Update the list of redacted areas
+            function updateRedactionList() {
+                if (!redactionAreas[currentPage] || redactionAreas[currentPage].length === 0) {
+                    redactionList.innerHTML = '<div class="text-muted">No selections yet</div>';
+                    return;
+                }
+                
+                let html = '';
+                redactionAreas[currentPage].forEach((rect, index) => {
+                    const [x1, y1, x2, y2] = rect;
+                    html += `
+                        <div class="redaction-item mb-1 d-flex justify-content-between">
+                            <small>#${index + 1}: ${Math.round(x2-x1)}×${Math.round(y2-y1)}</small>
+                            <button class="btn btn-sm btn-link p-0 text-danger remove-redaction" 
+                                data-index="${index}">✕</button>
+                        </div>
+                    `;
+                });
+                
+                redactionList.innerHTML = html;
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-redaction').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeRedactionArea(index);
+                    });
+                });
+            }
+            
+            // Remove a specific redaction area
+            function removeRedactionArea(index) {
+                if (!redactionAreas[currentPage]) return;
+                
+                redactionAreas[currentPage].splice(index, 1);
+                
+                // Redraw redactions
+                redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                drawExistingRedactions();
+                
+                // Update UI
+                updateRedactionList();
+                updateCornerPreview();
+            }
+            
+            // Add a new redaction area
+            function addRedactionArea(x1, y1, x2, y2) {
+                // Convert to unscaled coordinates for storage
+                const unscaledX1 = x1 / scale;
+                const unscaledY1 = y1 / scale;
+                const unscaledX2 = x2 / scale;
+                const unscaledY2 = y2 / scale;
+                
+                // Initialize array for current page if needed
+                if (!redactionAreas[currentPage]) {
+                    redactionAreas[currentPage] = [];
+                }
+                
+                // Add the redaction rectangle
+                redactionAreas[currentPage].push([
+                    unscaledX1, unscaledY1, unscaledX2, unscaledY2
+                ]);
+                
+                // Update UI
+                updateRedactionList();
+                updateCornerPreview();
+            }
+            
+            // Clear all redaction areas on the current page
+            function clearCurrentPageRedactions() {
+                if (confirm("Are you sure you want to clear all selections on this page?")) {
+                    redactionAreas[currentPage] = [];
+                    redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                    updateRedactionList();
+                    updateCornerPreview();
+                }
+            }
+            
+            // Toggle drawing mode
+            function toggleDrawingMode() {
+                drawingMode = !drawingMode;
+                updateDrawingModeDisplay();
+            }
+            
+            // Update drawing mode display
+            function updateDrawingModeDisplay() {
+                drawingModeStatus.textContent = drawingMode ? 'On' : 'Off';
+                if (drawingMode) {
+                    toggleDrawingBtn.textContent = 'Disable Selection';
+                } else {
+                    toggleDrawingBtn.textContent = 'Enable Selection';
+                }
+            }
+            
+            // Detect text areas on the current page
+            function detectTextAreas() {
+                pageLoading.style.display = 'block';
+                
+                const formData = new FormData();
+                formData.append('get_page', '1');
+                formData.append('pdf_path', pdfPath);
+                formData.append('page_num', currentPage);
+                formData.append('detect_text', '1');
+                
+                fetch('/pages/security/redact', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' && data.page.text_areas) {
+                        const textAreas = data.page.text_areas;
+                        
+                        // Add each text area as a redaction
+                        for (const rect of textAreas) {
+                            addRedactionArea(rect[0] * scale, rect[1] * scale, rect[2] * scale, rect[3] * scale);
+                        }
+                        
+                        // Redraw
+                        redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                        drawExistingRedactions();
+                        
+                        pageLoading.style.display = 'none';
+                    } else {
+                        alert('No text areas detected or error occurred.');
+                        pageLoading.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error detecting text areas. See console for details.');
+                    pageLoading.style.display = 'none';
+                });
+            }
+            
+            // Apply redactions to the PDF
+            function applyRedactions() {
+                if (Object.keys(redactionAreas).length === 0) {
+                    alert("Please select at least one area to redact.");
+                    return;
+                }
+                
+                if (!confirm("Are you sure you want to apply redactions? This action permanently removes content and cannot be undone.")) {
+                    return;
+                }
+                
+                pageLoading.style.display = 'block';
+                pageLoading.textContent = 'Applying redactions...';
+                
+                const formData = new FormData();
+                formData.append('apply_redactions', '1');
+                formData.append('pdf_path', pdfPath);
+                formData.append('redaction_data', JSON.stringify(redactionAreas));
+                
+                fetch('/pages/security/redact', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Redirect to download
+                        window.location.href = '/pages/security/redact?download=1&output_path=' + 
+                            encodeURIComponent(data.output_path) + 
+                            '&filename=' + encodeURIComponent(originalFilename);
+                    } else {
+                        alert('Error applying redactions: ' + data.message);
+                        pageLoading.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error applying redactions. See console for details.');
+                    pageLoading.style.display = 'none';
+                });
+            }
+            
+            // Set up all event listeners
+            function setupEventListeners() {
+                // Navigation buttons
+                prevPageBtn.addEventListener('click', function() {
+                    if (currentPage > 0) {
+                        loadPage(currentPage - 1);
+                    }
+                });
+                
+                nextPageBtn.addEventListener('click', function() {
+                    loadPage(currentPage + 1);
+                });
+                
+                // Drawing events on the PDF canvas
+                pdfCanvas.addEventListener('mousedown', function(e) {
+                    if (!drawingMode) return;
+                    
+                    isDrawing = true;
+                    const rect = pdfCanvas.getBoundingClientRect();
+                    startX = e.clientX - rect.left;
+                    startY = e.clientY - rect.top;
+                });
+                
+                pdfCanvas.addEventListener('mousemove', function(e) {
+                    if (!isDrawing || !drawingMode) return;
+                    
+                    const rect = pdfCanvas.getBoundingClientRect();
+                    const endX = e.clientX - rect.left;
+                    const endY = e.clientY - rect.top;
+                    
+                    // Clear the canvas and redraw existing redactions
+                    redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                    drawExistingRedactions();
+                    
+                    // Draw the new rectangle
+                    const width = Math.abs(endX - startX);
+                    const height = Math.abs(endY - startY);
+                    drawHighlight(
+                        Math.min(startX, endX),
+                        Math.min(startY, endY),
+                        width,
+                        height
+                    );
+                });
+                
+                pdfCanvas.addEventListener('mouseup', function(e) {
+                    if (!isDrawing || !drawingMode) return;
+                    
+                    const rect = pdfCanvas.getBoundingClientRect();
+                    const endX = e.clientX - rect.left;
+                    const endY = e.clientY - rect.top;
+                    
+                    // Add the redaction area (if it has a non-zero size)
+                    if (Math.abs(endX - startX) > 5 && Math.abs(endY - startY) > 5) {
+                        addRedactionArea(
+                            Math.min(startX, endX),
+                            Math.min(startY, endY),
+                            Math.max(startX, endX),
+                            Math.max(startY, endY)
+                        );
+                    }
+                    
+                    isDrawing = false;
+                });
+                
+                pdfCanvas.addEventListener('mouseleave', function() {
+                    if (isDrawing) {
+                        isDrawing = false;
+                        redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                        drawExistingRedactions();
+                    }
+                });
+                
+                // Button actions
+                toggleDrawingBtn.addEventListener('click', toggleDrawingMode);
+                clearCurrentBtn.addEventListener('click', clearCurrentPageRedactions);
+                detectTextBtn.addEventListener('click', detectTextAreas);
+                applyRedactionsBtn.addEventListener('click', applyRedactions);
+                showPreviewCheckbox.addEventListener('change', updatePreviewVisibility);
+                
+                // Highlight style selection
+                highlightStyleSelect.addEventListener('change', function() {
+                    highlightStyle = this.value;
+                    // Redraw with new style
+                    redactionCtx.clearRect(0, 0, redactionCanvas.width, redactionCanvas.height);
+                    drawExistingRedactions();
+                });
+            }
+            
+            // Start the application
+            init();
+        });
+    </script>
+    {% endif %}
 {% endblock %}

@@ -6,6 +6,7 @@ import os
 import fitz
 
 from tools.optimise.compress import compress_view
+from tools.security.redact import redact_view
 
 #------------------------- Main Pages -------------------------
 
@@ -237,9 +238,9 @@ def sign():
 def compare():
     return render_template('pages/security/compare.html')
 
-@app.route('/pages/security/redact')
+@app.route('/pages/security/redact', methods=['GET', 'POST'])
 def redact():
-    return render_template('pages/security/redact.html')
+    return redact_view()
 
 @app.route('/pages/security/flatten')
 def flatten():
