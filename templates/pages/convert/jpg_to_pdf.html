@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block title %}JPG to PDF - RevisePDF{% endblock %}
 {% block content %}
-    <h1>JPG to PDF</h1>
-    <p>Combine JPG images into a single PDF file.</p>
+        <h2>Upload a JPG to Convert to PDF</h2>
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept="image/jpeg" required>
+            <button type="submit">Convert</button>
+        </form>
 {% endblock %}
