@@ -5,6 +5,7 @@ from io import BytesIO
 import os
 import fitz
 
+from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 
@@ -92,9 +93,9 @@ def task_generator():
     return render_template('pages/analysis/task_generator.html')
 
 # Convert
-@app.route('/pages/convert/jpg_to_pdf')
+@app.route('/pages/convert/jpg_to_pdf', methods=['GET', 'POST'])
 def jpg_to_pdf():
-    return render_template('pages/convert/jpg_to_pdf.html')
+    return jpg_to_pdf_view()
 
 @app.route('/pages/convert/word_to_pdf')
 def word_to_pdf():
