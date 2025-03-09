@@ -1,9 +1,5 @@
-from flask import render_template, request, redirect, send_from_directory, url_for
-from werkzeug.utils import secure_filename
+from flask import render_template
 from app import app
-from io import BytesIO
-import os
-import fitz
 
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
