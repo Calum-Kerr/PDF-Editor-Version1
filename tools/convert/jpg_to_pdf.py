@@ -1,6 +1,7 @@
-from flask import Flask, request, send_file, render_template, jsonify
+from flask import request, send_file, render_template, jsonify
 from PIL import Image
 import io
+import os
 
 def jpg_to_pdf_view():
     """
@@ -22,10 +23,14 @@ def jpg_to_pdf_view():
                 img.save(pdf_bytes, format='PDF')  # Save the image to the byte stream in PDF format
                 pdf_bytes.seek(0)  # Reset the stream position to the beginning
 
+                # Get the original file name without extension and append '_converted'
+                original_filename = os.path.splitext(file.filename)[0]
+                converted_filename = f"{original_filename}_converted.pdf"
+
                 return send_file(  # Return the PDF file as a response
                     pdf_bytes,
                     as_attachment=True,  # Force download
-                    download_name="converted.pdf",  # Set the downloaded file name
+                    download_name=converted_filename,  # Set the downloaded file name
                     mimetype="application/pdf"  # Set the correct MIME type
                 )
 
@@ -35,4 +40,4 @@ def jpg_to_pdf_view():
         else:
             return jsonify(error="Invalid file type. Only .jpg and .jpeg are allowed"), 400  # Return error for invalid file types
 
-    return render_template('pages/convert/jpg_to_pdf.html')  # Render the HTML template for the conversion form (for GET requests
+    return render_template('pages/convert/jpg_to_pdf.html')  # Render the HTML template for the conversion form (for GET requests)
