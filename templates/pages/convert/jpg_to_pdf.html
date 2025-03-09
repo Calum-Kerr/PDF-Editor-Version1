@@ -1,9 +1,32 @@
 {% extends 'base.html' %}
 {% block title %}JPG to PDF - RevisePDF{% endblock %}
 {% block content %}
-        <h2>Upload a JPG to Convert to PDF</h2>
-        <form method="post" enctype="multipart/form-data">
-            <input type="file" name="file" accept="image/jpeg" required>
-            <button type="submit">Convert</button>
-        </form>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">.jpg to .pdf</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Convert a .jpg to a .pdf</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Select .jpg File</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".jpg" required>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn border border-secondary">Convert .jpg to .pdf</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
