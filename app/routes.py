@@ -4,6 +4,8 @@ from app import app
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
+from tools.organise.merge import merge_view
+
 
 #------------------------- Main Pages -------------------------
 
@@ -198,9 +200,9 @@ def repair():
 def extract():
     return render_template('pages/organise/extract.html')
 
-@app.route('/pages/organise/merge')
+@app.route('/pages/organise/merge', methods=['get', 'post'])
 def merge():
-    return render_template('pages/organise/merge.html')
+    return merge_view()
 
 @app.route('/pages/organise/remove')
 def remove():
