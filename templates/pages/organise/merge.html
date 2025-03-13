@@ -1,6 +1,105 @@
 {% extends 'base.html' %}
 {% block title %}Merge PDF - RevisePDF{% endblock %}
 {% block content %}
-    <h1>Merge PDF</h1>
-    <p>Combine multiple PDFs into a single document.</p>
+    <title>PDF Merger</title>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Merge PDF</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Merge uploaded PDF files into one file.</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <div id="drop-area">
+                                    <p>Drag & Drop PDF files here or click to select</p>
+                                    <input type="file" id="fileElem" multiple accept="application/pdf" name="files" style="display:none">
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <ul id="file-list"></ul>
+                                <button type="submit" class="btn border border-secondary">Merge PDF</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let dropArea = document.getElementById('drop-area');
+        let fileElem = document.getElementById('fileElem');
+        let fileList = document.getElementById('file-list');
+        let filesArray = []; // Store the files in an array
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false)
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false)
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false)
+        });
+
+        function highlight(e) {
+            dropArea.style.borderColor = '#007bff';
+        }
+
+        function unhighlight(e) {
+            dropArea.style.borderColor = '#ccc';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            files = [...files];
+            files.forEach(file => {
+                if(file.type === "application/pdf"){
+                  addFileToList(file);
+                  filesArray.push(file); //Store file in array
+                }
+            });
+            // Create a new DataTransfer object and add the files to it.
+            const dataTransfer = new DataTransfer();
+            filesArray.forEach(file => {
+                dataTransfer.items.add(file);
+            });
+            fileElem.files = dataTransfer.files; // Assign the DataTransfer files to the file input
+        }
+
+        dropArea.addEventListener('click', () => {
+          fileElem.click();
+        });
+
+        fileElem.addEventListener('change', (e) => {
+          handleFiles(e.target.files);
+        });
+
+        function addFileToList(file) {
+            let listItem = document.createElement('li');
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+        }
+    </script>
 {% endblock %}
