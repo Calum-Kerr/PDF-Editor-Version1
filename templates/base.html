@@ -257,6 +257,34 @@
                 vertical-align: middle;
                 display: inline-block;
             }
+            
+            /* Responsive styles for mega menu */
+            @media (max-width: 991.98px) {
+                .mega-menu-container {
+                    padding: 20px 15px; /* Reduce padding */
+                    max-height: 75vh; /* Limit height and allow scrolling */
+                    overflow-y: auto;
+                }
+            
+                .mega-menu-grid {
+                    grid-template-columns: 1fr; /* Stack columns vertically */
+                    grid-gap: 20px; /* Adjust gap for vertical layout */
+                }
+            
+                .mega-menu-category {
+                    margin-bottom: 10px; /* Slightly reduce space below category title */
+                    padding-bottom: 8px;
+                }
+            
+                .mega-menu-links {
+                    gap: 10px; /* Reduce gap between links */
+                }
+            
+                .mega-menu-links a {
+                    padding: 8px 10px; /* Adjust padding */
+                    font-size: 15px; 
+                }
+            }
         </style>
     </head>
     <body>
