@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1491)"><rect width="1000" height="1000" fill="#ffffff"></rect><g transform="matrix(9.523809523809524,0,0,9.523809523809524,195.23809523809524,0)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="64" height="105"><svg width="64" height="105" viewBox="0 0 64 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_97_136)">
+<path d="M7.94141 21.9062H31.4766C36.8151 21.9062 41.3236 22.7201 45.002 24.3477C48.7129 25.9753 51.5286 28.3841 53.4492 31.5742C55.4023 34.7318 56.3789 38.6217 56.3789 43.2441C56.3789 46.4993 55.7116 49.4779 54.377 52.1797C53.0749 54.849 51.1868 57.1276 48.7129 59.0156C46.2715 60.8711 43.3418 62.2546 39.9238 63.166L37.2871 64.1914H15.168L15.0703 56.5254H31.7695C35.1549 56.5254 37.9707 55.9395 40.2168 54.7676C42.4629 53.5632 44.1556 51.9518 45.2949 49.9336C46.4342 47.9154 47.0039 45.6855 47.0039 43.2441C47.0039 40.5098 46.4668 38.1172 45.3926 36.0664C44.3184 34.0156 42.6257 32.4368 40.3145 31.3301C38.0358 30.1908 35.0898 29.6211 31.4766 29.6211H17.3652V93H7.94141V21.9062ZM49.4941 93L32.209 60.7734L42.0234 60.7246L59.5527 92.4141V93H49.4941Z" fill="#238287"></path>
+<path d="M54.5 91.5L60 86V97L47 95.5L54.5 91.5Z" fill="#238287"></path>
+<path d="M54.7362 90.7363L57.4999 92.5L50.9999 96.0001L42 79.0002L54.7362 90.7363Z" fill="#238287"></path>
+</g>
+<defs>
+<filter id="filter0_d_97_136" x="3.94141" y="21.9062" width="60.0586" height="83.0938" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+<feOffset dy="4"></feOffset>
+<feGaussianBlur stdDeviation="2"></feGaussianBlur>
+<feComposite in2="hardAlpha" operator="out"></feComposite>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_97_136"></feBlend>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_97_136" result="shape"></feBlend>
+</filter>
+<clipPath id="SvgjsClipPath1491"><rect width="1000" height="1000" x="0" y="0" rx="0" ry="0"></rect></clipPath></defs>
+</svg></svg></g></g></svg>

@@ -22,6 +22,22 @@ def about():
 def upload():
     return render_template('upload.html')
 
+@app.route('/all-tools')
+def all_tools():
+    return render_template('all_tools.html')
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy_policy.html')
+
 @app.route('/optimise')
 def optimise():
     return render_template('optimise.html')
@@ -57,6 +73,10 @@ def developer():
 @app.route('/analysis')
 def analysis():
     return render_template('analysis.html')
+
+@app.route('/pricing')
+def pricing():
+    return render_template('pricing.html')
 
 #------------------------- Pages for each feature -------------------------
 
@@ -139,6 +159,10 @@ def pdf_to_excel():
 def pdf_to_pdfa():
     return render_template('pages/convert/pdf_to_pdfa.html')
 
+@app.route('/pages/convert/pdf_to_text')
+def pdf_to_text():
+    return render_template('pages/convert/pdf_to_text.html')
+
 # Creative
 @app.route('/pages/creative/cover_creator')
 def cover_creator():
@@ -182,6 +206,14 @@ def page_numbers():
 def edit_content():
     return render_template('pages/edit/edit_content.html')
 
+@app.route('/pages/edit/edit_text')
+def edit_text():
+    return render_template('pages/edit/edit_text.html')
+
+@app.route('/pages/edit/annotate')
+def annotate():
+    return render_template('pages/edit/annotate.html')
+
 # Optimise
 @app.route('/pages/optimise/compress')
 def compress():
@@ -220,6 +252,14 @@ def rotate():
 def split():
     return render_template('pages/organise/split.html')
 
+@app.route('/pages/organise/reorder')
+def reorder():
+    return render_template('pages/organise/reorder.html')
+
+@app.route('/pages/organise/delete_pages')
+def delete_pages():
+    return render_template('pages/organise/delete_pages.html')
+
 # Security
 @app.route('/pages/security/unlock')
 def unlock():
@@ -245,11 +285,36 @@ def redact():
 def flatten():
     return render_template('pages/security/flatten.html')
 
+@app.route('/pages/security/password_protect')
+def password_protect():
+    return render_template('pages/security/password_protect.html')
+
+@app.route('/pages/security/digital_signature')
+def digital_signature():
+    return render_template('pages/security/digital_signature.html')
+
+@app.route('/pages/security/remove_password')
+def remove_password():
+    return render_template('pages/security/remove_password.html')
+
 #------------------------- File Uploads -------------------------
 
 @app.route('/pages/optimise/compress', methods=['GET', 'POST'], endpoint='compress_pdf')
-def compress():
+def compress_pdf():
     return compress_view()
+
+# Add these new routes
+@app.route('/terms')
+def terms():
+    return render_template('terms_of_service.html')
+
+@app.route('/cookies')
+def cookies():
+    return render_template('cookies_policy.html')
+
+@app.route('/accessibility-statement')
+def accessibility_statement():
+    return render_template('accessibility_statement.html')
 
 if __name__ == "__main__":
     app.run(debug=True)

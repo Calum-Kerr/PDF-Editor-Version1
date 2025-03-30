@@ -1,132 +1,115 @@
 {% extends 'base.html' %}
-{% block title %}Convert - RevisePDF{% endblock %}
+{% block title %}Convert PDF Files - RevisePDF{% endblock %}
 {% block content %}
-    <h1>Convert Your PDF</h1>
-    <p>Choose from the tools below to convert your PDF files to and from different formats.</p>
+    <h1 class="display-5 fw-bold">Convert Files</h1>
+    <p class="lead">Convert your files to and from PDF format with our powerful conversion tools.</p>
 
-    <ul class="nav nav-tabs" id="convertTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="convert-to-tab" data-bs-toggle="tab" data-bs-target="#convert-to" type="button" role="tab" aria-controls="convert-to" aria-selected="true">Convert to PDF</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="convert-from-tab" data-bs-toggle="tab" data-bs-target="#convert-from" type="button" role="tab" aria-controls="convert-from" aria-selected="false">Convert from PDF</button>
-        </li>
-    </ul>
-
-    <div class="tab-content mt-4" id="convertTabsContent">
-        <div class="tab-pane fade show active" id="convert-to" role="tabpanel" aria-labelledby="convert-to-tab">
-            <div class="row gy-4">
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">JPG to PDF</h5>
-                            <p class="card-text">Combine JPG images into a single PDF file.</p>
-                            <a href="/pages/convert/jpg_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+    <div class="tools-container my-4">
+        <div class="tools-horizontal-scroll">
+            <div class="d-flex flex-nowrap overflow-auto pb-3">
+                <!-- Word to PDF Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707L9.293 0z" fill="#238287"/>
+                                <path d="M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1z" fill="#238287"/>
+                                <path d="M5.857 5.784h1.786v.001h.001a.25.25 0 0 1 .238.325l-.068.204-.103.203A.25.25 0 0 1 7.5 6.75h-1a.25.25 0 0 1-.238-.325l.068-.204.103-.203a.25.25 0 0 1 .238-.167z" fill="white"/>
+                                <path d="M5.652 7.44a1 1 0 0 1 1.187.748l.317 1.268a1 1 0 0 1-.748 1.188l-1.267.317a1 1 0 0 1-1.188-.748L3.636 9a1 1 0 0 1 .748-1.188l1.268-.317z" fill="white"/>
+                                <path d="M8.118 7.767h.75a.25.25 0 0 1 .25.25v2.996a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25V8.016a.25.25 0 0 1 .25-.25z" fill="white"/>
+                                <path d="M8.203 11h.75a.25.25 0 0 1 .25.25v.749a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25v-.749a.25.25 0 0 1 .25-.25z" fill="white"/>
+                                <path d="M8.203 5.5h.75a.25.25 0 0 1 .25.25v2.996a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25V5.75a.25.25 0 0 1 .25-.25z" fill="white"/>
+                                <path d="M11.525 7.118h.75a.25.25 0 0 1 .25.25v.749a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25v-.749a.25.25 0 0 1 .25-.25z" fill="white"/>
+                            </svg>
                         </div>
+                        <h5 class="card-title">Word to PDF</h5>
+                        <p class="card-text">Convert Word documents to PDF format with formatting preserved.</p>
+                        <a href="{{ url_for('word_to_pdf') }}" class="btn btn-primary mt-auto">Convert</a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">Word to PDF</h5>
-                            <p class="card-text">Transform your Word documents into PDFs.</p>
-                            <a href="/pages/convert/word_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                
+                <!-- JPG to PDF Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" fill="#238287"/>
+                                <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z" fill="#238287"/>
+                            </svg>
                         </div>
+                        <h5 class="card-title">JPG to PDF</h5>
+                        <p class="card-text">Convert your images to PDF documents with high quality.</p>
+                        <a href="{{ url_for('jpg_to_pdf') }}" class="btn btn-primary mt-auto">Convert</a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PowerPoint to PDF</h5>
-                            <p class="card-text">Convert your PowerPoint presentations into PDF format.</p>
-                            <a href="/pages/convert/ppt_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                
+                <!-- PDF to JPG Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707L9.293 0z" fill="#238287"/>
+                                <path d="M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1z" fill="#238287"/>
+                                <path d="M6.002 11.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0z" fill="white"/>
+                                <path d="M12.002 11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1 0-1h.5v-.5a.5.5 0 0 1 .5-.5z" fill="white"/>
+                                <path d="M12.002 6.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0 0 1h.5v.5a.5.5 0 0 0 1 0v-1z" fill="white"/>
+                                <path d="M4.502 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 1 0v-.5h.5a.5.5 0 0 0 0-1h-1z" fill="white"/>
+                                <path d="M4.502 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-.5v.5a.5.5 0 0 1-1 0v-1z" fill="white"/>
+                            </svg>
                         </div>
+                        <h5 class="card-title">PDF to JPG</h5>
+                        <p class="card-text">Extract images from your PDF files as JPG format.</p>
+                        <a href="{{ url_for('pdf_to_jpg') }}" class="btn btn-primary mt-auto">Convert</a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">Excel to PDF</h5>
-                            <p class="card-text">Convert your Excel spreadsheets into PDF format.</p>
-                            <a href="/pages/convert/excel_to_pdf" class="btn btn-primary mt-auto">Convert</a>
+                
+                <!-- PDF to Text Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707L9.293 0z" fill="#238287"/>
+                                <path d="M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1z" fill="#238287"/>
+                                <path d="M2.5 9.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1z" fill="white"/>
+                                <path d="M2.5 11.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1z" fill="white"/>
+                                <path d="M2.5 7.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1z" fill="white"/>
+                                <path d="M2.5 5.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1 0-1z" fill="white"/>
+                            </svg>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">HTML to PDF</h5>
-                            <p class="card-text">Transform HTML files into a neatly formatted PDF.</p>
-                            <a href="/pages/convert/html_to_pdf" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">Zip of Images to PDF</h5>
-                            <p class="card-text">Convert a zip of images into a single PDF document.</p>
-                            <a href="/pages/convert/zip_to_pdf" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
+                        <h5 class="card-title">PDF to Text</h5>
+                        <p class="card-text">Extract all text content from your PDF documents.</p>
+                        <a href="{{ url_for('pdf_to_text') }}" class="btn btn-primary mt-auto">Convert</a>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="tab-pane fade" id="convert-from" role="tabpanel" aria-labelledby="convert-from-tab">
-            <div class="row gy-4">
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to JPG</h5>
-                            <p class="card-text">Extract high-quality images from your PDF file.</p>
-                            <a href="/pages/convert/pdf_to_jpg" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
+    <!-- Why Choose RevisePDF Section -->
+    <div class="why-choose-section py-5">
+        <h2 class="text-center mb-4">Why Use Our Conversion Tools?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">Format Preservation</h3>
+                        <p class="card-text">Our conversion tools maintain the original formatting of your documents.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to Panoramic</h5>
-                            <p class="card-text">Generate a panoramic view from your PDF pages.</p>
-                            <a href="/pages/convert/pdf_to_panoramic" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">High Quality Images</h3>
+                        <p class="card-text">When converting images, we maintain high resolution for professional results.</p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to Word</h5>
-                            <p class="card-text">Convert PDF files into editable Word documents.</p>
-                            <a href="/pages/convert/pdf_to_word" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to PowerPoint</h5>
-                            <p class="card-text">Convert your PDF into PowerPoint slides.</p>
-                            <a href="/pages/convert/pdf_to_ppt" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to Excel</h5>
-                            <p class="card-text">Extract tables and data from PDFs into Excel spreadsheets.</p>
-                            <a href="/pages/convert/pdf_to_excel" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card" style="height: 100%;">
-                        <div class="card-body text-center d-flex flex-column justify-content-between">
-                            <h5 class="card-title">PDF to PDF/A</h5>
-                            <p class="card-text">Convert your PDF into an archival PDF/A format.</p>
-                            <a href="/pages/convert/pdf_to_pdfa" class="btn btn-primary mt-auto">Convert</a>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">Batch Processing</h3>
+                        <p class="card-text">Convert multiple files at once to save time on your document workflow.</p>
                     </div>
                 </div>
             </div>

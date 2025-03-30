@@ -1,37 +1,154 @@
 {% extends 'base.html' %}
-{% block title %}Optimise - RevisePDF{% endblock %}
+{% block title %}Optimise Your PDF - RevisePDF{% endblock %}
 {% block content %}
-    <h1>Optimise Your PDF</h1>
-    <p>Choose from the tools below to optimise your PDF files.</p>
+    <h1 class="display-5 fw-bold">Optimise Your PDF</h1>
+    <p class="lead">Choose from the tools below to improve and optimize your PDF files.</p>
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card" style="height: 100%;">
-                <div class="card-body text-center d-flex flex-column justify-content-between">
-                    <h5 class="card-title">Compress PDF</h5>
-                    <p class="card-text">Reduce the size of your PDF for easier sharing.</p>
-                    <a href="/pages/optimise/compress" class="btn btn-primary mt-auto">Compress</a>
+    <div class="tools-container my-4">
+        <div class="tools-horizontal-scroll">
+            <div class="d-flex flex-nowrap overflow-auto pb-3">
+                <!-- Compress PDF Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <rect width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Compress PDF</h5>
+                        <p class="card-text">Reduce the size of your PDF for easier sharing.</p>
+                        <a href="{{ url_for('compress') }}" class="btn btn-primary mt-auto">Compress</a>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card" style="height: 100%;">
-                <div class="card-body text-center d-flex flex-column justify-content-between">
-                    <h5 class="card-title">Repair PDF</h5>
-                    <p class="card-text">Fix corrupted or damaged PDF files.</p>
-                    <a href="/pages/optimise/repair" class="btn btn-primary mt-auto">Repair</a>
+                
+                <!-- Repair PDF Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <rect width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">Repair PDF</h5>
+                        <p class="card-text">Fix corrupted or damaged PDF files.</p>
+                        <a href="{{ url_for('repair') }}" class="btn btn-primary mt-auto">Repair</a>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card" style="height: 100%;">
-                <div class="card-body text-center d-flex flex-column justify-content-between">
-                    <h5 class="card-title">OCR PDF</h5>
-                    <p class="card-text">Extract text from scanned PDFs.</p>
-                    <a href="/pages/optimise/ocr" class="btn btn-primary mt-auto">OCR</a>
+                
+                <!-- OCR PDF Card -->
+                <div class="card tool-card me-3">
+                    <div class="card-body">
+                        <div class="tool-icon bg-light rounded p-3 mb-3 text-center">
+                            <svg width="40" height="40" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="tool-svg">
+                                <rect width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                            </svg>
+                        </div>
+                        <h5 class="card-title">OCR PDF</h5>
+                        <p class="card-text">Extract text from scanned PDFs.</p>
+                        <a href="{{ url_for('ocr') }}" class="btn btn-primary mt-auto">OCR</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Why Choose RevisePDF Section -->
+    <div class="why-choose-section py-5">
+        <h2 class="text-center mb-4">Why Use Our Optimisation Tools?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">Fast Processing</h3>
+                        <p class="card-text">Our tools are optimized for speed without sacrificing quality.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">No Watermarks</h3>
+                        <p class="card-text">Unlike competitors, we don't add watermarks to your optimized files.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title h5">Advanced Algorithms</h3>
+                        <p class="card-text">Our tools use intelligent algorithms to preserve quality while reducing size.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tool-card {
+            min-width: 250px;
+            max-width: 300px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tool-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tools-horizontal-scroll {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .tools-horizontal-scroll:after {
+            content: "⟶";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: var(--primary-color);
+            opacity: 0.7;
+        }
+        
+        /* Why Choose section styling */
+        .why-choose-section .card {
+            border-width: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .why-choose-section .card:hover {
+            transform: scale(1.03);
+        }
+    </style>
 {% endblock %}
