@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}JPG to PDF - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>JPG to PDF</h1>
-    <p>Combine JPG images into a single PDF file.</p>
+<div class="upload-section text-center">
+    <h1 class="mb-3">JPG to PDF</h1>
+    <p class="mb-4">Combine JPG images into a single PDF file.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-3">
+        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".jpg,.jpeg" required multiple>
+        <label for="fileInput" class="btn btn-primary select-file-button">
+            Select file(s)
+        </label>
+    </form>
+
+    <p class="drag-drop-text mt-2">or drag and drop here</p>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
+        Drop files here
+    </div>
+</div>
 {% endblock %}

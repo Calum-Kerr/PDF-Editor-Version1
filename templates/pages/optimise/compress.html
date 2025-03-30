@@ -1,9 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Compress PDF - RevisePDF{% endblock %}
+
 {% block content %}
-<form method="POST" enctype="multipart/form-data">
-  <label for="pdf_file">Upload a PDF:</label>
-  <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required>
-  <button type="submit">Download PDF</button>
-</form>
+<div class="upload-section text-center">
+    <h1 class="mb-3">Compress PDF</h1>
+    <p class="mb-4">Reduce the file size of your PDF while maintaining quality.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-3">
+        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required>
+        <label for="fileInput" class="btn btn-primary select-file-button">
+            Select a file
+        </label>
+    </form>
+
+    <p class="drag-drop-text mt-2">or drag and drop here</p>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
+        Drop files here
+    </div>
+</div>
 {% endblock %}

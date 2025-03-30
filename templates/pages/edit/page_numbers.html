@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Page Numbers - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Page Numbers</h1>
-    <p>Add or customise page numbers in your PDF file.</p>
+<div class="upload-section text-center">
+    <h1 class="mb-3">Page Numbers</h1>
+    <p class="mb-4">Add or customise page numbers in your PDF file.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-3">
+        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required>
+        <label for="fileInput" class="btn btn-primary select-file-button">
+            Select a file
+        </label>
+    </form>
+
+    <p class="drag-drop-text mt-2">or drag and drop here</p>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
+        Drop files here
+    </div>
+</div>
 {% endblock %}
