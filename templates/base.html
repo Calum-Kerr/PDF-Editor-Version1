@@ -57,10 +57,10 @@
             }
             .logo-placeholder {
                 display: flex;
-                align-items: center;
+                
                 justify-content: flex-start;
-                width: 50px;
-                height: 50px;
+                width: 35px;
+                height: 35px;
             }
             .title-brand {
                 font-size: 1.5rem;
@@ -264,15 +264,12 @@
             <nav class="navbar navbar-light">
                 <div class="container">
                     <div class="navbar-container">
-                        <!-- Logo Placeholder - Left aligned -->
-                        <!-- 
+                        <!-- Logo now added here -->
                         <div class="logo-placeholder">
-                            SVG or Image will be added here later
+                            <a href="{{ url_for('index') }}">
+                                <img src="{{ url_for('static', filename='img/Group 60.png') }}" alt="RevisePDF Logo" style="height: 100%; width: auto;">
+                            </a>
                         </div>
-                        -->
-                        
-                        <!-- Temporary empty div until logo is ready -->
-                        <div class="logo-placeholder"></div>
                         
                         <!-- Title in center - Now clickable -->
                         <a href="{{ url_for('index') }}" class="title-brand">RevisePDF</a>
