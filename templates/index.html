@@ -473,6 +473,26 @@
         .why-choose-section .card:hover {
             transform: scale(1.03);
         }
+
+        /* Responsive styles for tool tabs */
+        @media (max-width: 767.98px) {
+            .tool-tabs .nav-pills {
+                flex-wrap: nowrap; /* Prevent wrapping */
+                overflow-x: auto;  /* Enable horizontal scrolling */
+                justify-content: flex-start; /* Align items to start */
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+            .tool-tabs .nav-pills::-webkit-scrollbar { 
+                display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+            }
+            .tool-tabs .nav-item {
+                flex-shrink: 0; /* Prevent items from shrinking */
+            }
+            .tool-tabs .nav-link {
+                white-space: nowrap; /* Keep text on one line */
+            }
+        }
     </style>
 {% endblock %}
 
