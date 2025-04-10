@@ -2,20 +2,313 @@
 {% block title %}Add Watermark - RevisePDF{% endblock %}
 
 {% block content %}
-<div class="upload-section text-center">
-    <h1 class="mb-3">Add Watermark</h1>
-    <p class="mb-4">Insert or customise watermarks in your PDF documents.</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Add Watermark</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Add text or image watermarks to your PDF documents.</p>
 
-    <form method="POST" enctype="multipart/form-data" class="mb-3">
-        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required>
-        <label for="fileInput" class="btn btn-primary select-file-button">
-            Select a file
-        </label>
-    </form>
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
 
-    <p class="drag-drop-text mt-2">or drag and drop here</p>
-    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
-        Drop files here
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Watermark Preview</h5>
+                                <div class="preview-container border" style="width: 100%; height: 300px; overflow: hidden; position: relative; background-color: white; display: flex; align-items: center; justify-content: center;">
+                                    <img id="watermark-preview" alt="Watermark Preview"
+                                        style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    <div id="preview-loading" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.1);"></div>
+                                </div>
+                                <div class="text-center mt-3" id="preview-status"></div>
+                                <div class="text-center mt-3">
+                                    <small class="text-muted">Preview updates as you change settings</small>
+                                    <p class="mt-2 mb-0"><strong>Current Settings:</strong></p>
+                                    <div id="settings-display">
+                                        <small class="d-block">Position: <span id="position-display">Center</span></small>
+                                        <small class="d-block">Opacity: <span id="opacity-display">0.3</span></small>
+                                        <small class="d-block">Rotation: <span id="rotation-display">0°</span></small>
+                                        <small class="d-block">Text: <span id="text-display">CONFIDENTIAL</span></small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <form method="POST" enctype="multipart/form-data" id="watermark-form">
+                                    <input type="hidden" name="preview" id="preview-request" value="0">
+
+                                    <div class="mb-3">
+                                        <label for="file" class="form-label">Select PDF File</label>
+                                        <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Watermark Type</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="watermark_type" id="text_watermark" value="text" checked>
+                                            <label class="form-check-label" for="text_watermark">
+                                                Text Watermark
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="watermark_type" id="image_watermark" value="image">
+                                            <label class="form-check-label" for="image_watermark">
+                                                Image Watermark
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Text Watermark Options -->
+                                    <div id="text_options">
+                                        <div class="mb-3">
+                                            <label for="watermark_text" class="form-label">Watermark Text</label>
+                                            <input type="text" class="form-control" id="watermark_text" name="watermark_text"
+                                                value="CONFIDENTIAL" placeholder="Enter watermark text">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="font_size" class="form-label">Font Size</label>
+                                            <input type="range" class="form-range" id="font_size" name="font_size"
+                                                min="10" max="100" value="30">
+                                            <div class="form-text" id="font_size_value">30</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="color" class="form-label">Text Color</label>
+                                            <input type="color" class="form-control form-control-color" id="color" name="color"
+                                                value="#808080" title="Choose watermark color">
+                                        </div>
+                                    </div>
+
+                                    <!-- Image Watermark Options -->
+                                    <div id="image_options" style="display:none;">
+                                        <div class="mb-3">
+                                            <label for="watermark_image" class="form-label">Watermark Image</label>
+                                            <input type="file" class="form-control" id="watermark_image" name="watermark_image"
+                                                accept="image/*">
+                                            <div class="form-text">Transparent PNG recommended for best results</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="scale" class="form-label">Image Scale</label>
+                                            <input type="range" class="form-range" id="scale" name="scale"
+                                                min="0.1" max="1.0" step="0.05" value="0.3">
+                                            <div class="form-text" id="scale_value">0.3</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Common Options -->
+                                    <div class="mb-3">
+                                        <label for="opacity" class="form-label">Opacity</label>
+                                        <input type="range" class="form-range" id="opacity" name="opacity"
+                                            min="0.1" max="1.0" step="0.05" value="0.3">
+                                        <div class="form-text" id="opacity_value">0.3</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="position" class="form-label">Position</label>
+                                        <select class="form-select" id="position" name="position">
+                                            <option value="center" selected>Center</option>
+                                            <option value="top-left">Top Left</option>
+                                            <option value="top-right">Top Right</option>
+                                            <option value="bottom-left">Bottom Left</option>
+                                            <option value="bottom-right">Bottom Right</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="rotation" class="form-label">Rotation (degrees)</label>
+                                        <input type="range" class="form-range" id="rotation" name="rotation"
+                                            min="0" max="345" step="15" value="0">
+                                        <div class="form-text" id="rotation_value">0°</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="page_range" class="form-label">Page Range (Optional)</label>
+                                        <input type="text" class="form-control" id="page_range" name="page_range"
+                                            placeholder="e.g., 1-3,5,7-9 (leave empty for all pages)">
+                                        <div class="form-text">
+                                            Specify pages to include (e.g., 1-3,5,7-9). Leave empty to include all pages.
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn border border-secondary">Add Watermark</button>
+                                    </div>
+                                </form>
+                                <!-- Debug button for immediate preview -->
+                                <button id="force-preview" class="btn btn-sm border mt-3">Force Update Preview</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <h5>Tips for Best Results</h5>
+                        <ul>
+                            <li>Use transparent PNG images for watermarks with logos</li>
+                            <li>Set lower opacity values (0.1-0.3) for background watermarks</li>
+                            <li>Diagonal text watermarks (45° rotation) often work well as document stamps</li>
+                            <li>For confidentiality notices, consider using bottom page positions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug status area
+            const statusArea = document.getElementById('preview-status');
+
+            // Set a default placeholder image
+            const placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAADwCAYAAAA+VemSAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAIyUlEQVR4nO3dz2sdZRzG8XfOyU2aH21DSJsUm5S0RkWkoBWlolhEqC4UBDfu3LhxVRf+Ae7cuXEluHCjVFEXghWKUC2CaARbWtqm9keTJjc3N7m5x8VM6w2NzTg5z3ee4fOBQJM7c+d9QvLNzNwzU3ieJwCm5F0PAODiETAwjsABYwgcMIbAAWMIHDCGwAFjCBwwhsABYwgcMIbAAWMIHDCGwAFjCBwwJuV6gP2YpBxPQJc4vv9pNkxSxvUQQJIROGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPGEDhgDIEDxhA4YAyBA8YQOGAMgQPG/AVwyzUAO4wv+wAAAABJRU5ErkJggg==';
+            document.getElementById('watermark-preview').src = placeholderImage;
+
+            // Elements for form controls
+            const textWatermark = document.getElementById('text_watermark');
+            const imageWatermark = document.getElementById('image_watermark');
+            const textOptions = document.getElementById('text_options');
+            const imageOptions = document.getElementById('image_options');
+            const watermarkText = document.getElementById('watermark_text');
+            const textDisplay = document.getElementById('text-display');
+            const fontSizeSlider = document.getElementById('font_size');
+            const fontSizeValue = document.getElementById('font_size_value');
+            const opacitySlider = document.getElementById('opacity');
+            const opacityValue = document.getElementById('opacity_value');
+            const opacityDisplay = document.getElementById('opacity-display');
+            const rotationSlider = document.getElementById('rotation');
+            const rotationValue = document.getElementById('rotation_value');
+            const rotationDisplay = document.getElementById('rotation-display');
+            const positionSelect = document.getElementById('position');
+            const positionDisplay = document.getElementById('position-display');
+            const colorInput = document.getElementById('color');
+
+            // Set initial values for displays
+            textDisplay.textContent = watermarkText.value;
+            opacityDisplay.textContent = opacitySlider.value;
+            rotationDisplay.textContent = rotationSlider.value + '°';
+            positionDisplay.textContent = positionSelect.options[positionSelect.selectedIndex].text;
+
+            // Initialize preview on page load
+            setTimeout(updatePreview, 500);
+
+            // Toggle watermark type options
+            textWatermark.addEventListener('change', function() {
+                if (this.checked) {
+                    textOptions.style.display = 'block';
+                    imageOptions.style.display = 'none';
+                    updatePreview();
+                }
+            });
+
+            imageWatermark.addEventListener('change', function() {
+                if (this.checked) {
+                    textOptions.style.display = 'none';
+                    imageOptions.style.display = 'block';
+                    // Reset to placeholder for image watermark (we can't preview without uploading)
+                    document.getElementById('watermark-preview').src = placeholderImage;
+                }
+            });
+
+            // Set up all event listeners for form controls
+            watermarkText.addEventListener('input', handleInputChange);
+            fontSizeSlider.addEventListener('input', handleSliderChange);
+            opacitySlider.addEventListener('input', handleOpacityChange);
+            rotationSlider.addEventListener('input', handleRotationChange);
+            positionSelect.addEventListener('change', handlePositionChange);
+            colorInput.addEventListener('input', handleInputChange);
+
+            // Force preview button
+            document.getElementById('force-preview').addEventListener('click', function() {
+                statusArea.innerHTML = '<div class="alert alert-info">Forcing preview update...</div>';
+                updatePreview();
+            });
+
+            // Event handlers
+            function handleInputChange(e) {
+                if (e.target.id === 'watermark_text') {
+                    textDisplay.textContent = e.target.value;
+                }
+                updatePreview();
+            }
+
+            function handleSliderChange(e) {
+                fontSizeValue.textContent = e.target.value;
+                updatePreview();
+            }
+
+            function handleOpacityChange(e) {
+                opacityValue.textContent = e.target.value;
+                opacityDisplay.textContent = e.target.value;
+                updatePreview();
+            }
+
+            function handleRotationChange(e) {
+                const degrees = e.target.value + '°';
+                rotationValue.textContent = degrees;
+                rotationDisplay.textContent = degrees;
+                updatePreview();
+            }
+
+            function handlePositionChange(e) {
+                positionDisplay.textContent = e.target.options[e.target.selectedIndex].text;
+                updatePreview();
+            }
+
+            // Function to update preview
+            function updatePreview() {
+                // Only update for text watermark
+                if (!textWatermark.checked) return;
+
+                const loadingElement = document.getElementById('preview-loading');
+                loadingElement.style.display = 'block';
+
+                // Get form data
+                const formData = new FormData();
+                formData.append('preview', '1');
+                formData.append('watermark_type', 'text');
+                formData.append('watermark_text', watermarkText.value);
+                formData.append('font_size', fontSizeSlider.value);
+                formData.append('color', colorInput.value);
+                formData.append('opacity', opacitySlider.value);
+                formData.append('rotation', rotationSlider.value);
+                formData.append('position', positionSelect.value);
+
+                statusArea.innerHTML = '<div class="small">Sending preview request...</div>';
+
+                // Send AJAX request
+                fetch('/pages/edit/add_watermark', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success' && data.preview) {
+                        document.getElementById('watermark-preview').src = 'data:image/png;base64,' + data.preview;
+                        statusArea.innerHTML = '<div class="small text-success">Preview updated successfully</div>';
+                    } else {
+                        console.error('Preview error:', data.message);
+                        statusArea.innerHTML = '<div class="small text-danger">Error: ' + (data.message || 'Unknown error') + '</div>';
+                    }
+                    loadingElement.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error generating preview:', error);
+                    statusArea.innerHTML = '<div class="small text-danger">Network error: ' + error.message + '</div>';
+                    loadingElement.style.display = 'none';
+                });
+            }
+        });
+    </script>
+
 {% endblock %}

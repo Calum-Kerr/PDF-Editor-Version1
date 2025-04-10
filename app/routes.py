@@ -6,7 +6,7 @@ from tools.optimise.compress import compress_view
 from tools.security.redact import redact_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 from tools.organise.merge import merge_view
-
+from tools.edit.add_watermark import add_watermark_view
 
 #------------------------- Main Pages -------------------------
 
@@ -195,9 +195,9 @@ def metadata_cleaner():
     return render_template('pages/developer/metadata_cleaner.html')
 
 # Edit
-@app.route('/pages/edit/add_watermark')
+@app.route('/pages/edit/add_watermark', methods=['GET', 'POST'])
 def add_watermark():
-    return render_template('pages/edit/add_watermark.html')
+    return add_watermark_view()
 
 @app.route('/pages/edit/page_numbers')
 def page_numbers():
