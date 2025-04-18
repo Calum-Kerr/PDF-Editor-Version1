@@ -1,6 +1,170 @@
 {% extends 'base.html' %}
 {% block title %}Split PDF - RevisePDF{% endblock %}
 {% block content %}
-    <h1>Split PDF</h1>
-    <p>Split your PDF file into smaller, separate documents.</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Split PDF</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Split your PDF file into smaller, separate documents.</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <div id="drop-area" class="drop-area">
+                                    <p>Drag & Drop PDF file here or click to select</p>
+                                    <input type="file" id="fileElem" accept="application/pdf" name="file" style="display:none">
+                                </div>
+                                <ul id="file-list" class="file-list"></ul>
+                            </div>
+                            <div class="mb-3">
+                                <label for="splitType" class="form-label">Split Type</label>
+                                <select class="form-select" id="splitType" name="splitType">
+                                    <option value="range">By Page Range</option>
+                                    <option value="individual">Each Page Separately</option>
+                                </select>
+                            </div>
+                            <div class="mb-3" id="rangeInput">
+                                <label for="pageRanges" class="form-label">Page Ranges</label>
+                                <input type="text" class="form-control" id="pageRanges" name="pageRanges" 
+                                       placeholder="e.g., 1-3, 4-6, 7">
+                                <div class="form-text">Separate ranges with commas. Example: 1-3, 4-6, 7</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">Split PDF</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        .drop-area:hover {
+            border-color: #007bff;
+        }
+
+        .drop-area p {
+            margin: 0;
+            color: #666;
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .file-list li {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+
+    <script>
+        let dropArea = document.getElementById('drop-area');
+        let fileElem = document.getElementById('fileElem');
+        let fileList = document.getElementById('file-list');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropArea.style.borderColor = '#007bff';
+            dropArea.style.backgroundColor = '#e8f0fe';
+        }
+
+        function unhighlight(e) {
+            dropArea.style.borderColor = '#ccc';
+            dropArea.style.backgroundColor = '#f8f9fa';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer;
+            let files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            fileList.innerHTML = '';
+            
+            const dataTransfer = new DataTransfer();
+            
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === "application/pdf") {
+                    addFileToList(file);
+                    dataTransfer.items.add(file);
+                } else {
+                    addErrorMessage("Please upload a PDF file");
+                }
+            }
+            
+            fileElem.files = dataTransfer.files;
+        }
+
+        function addFileToList(file) {
+            let listItem = document.createElement('li');
+            listItem.textContent = file.name;
+            fileList.appendChild(listItem);
+        }
+
+        function addErrorMessage(message) {
+            let listItem = document.createElement('li');
+            listItem.textContent = message;
+            listItem.style.color = 'red';
+            fileList.appendChild(listItem);
+        }
+
+        dropArea.addEventListener('click', () => {
+            fileElem.click();
+        });
+
+        fileElem.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        document.getElementById('splitType').addEventListener('change', function() {
+            const rangeInput = document.getElementById('rangeInput');
+            rangeInput.style.display = this.value === 'range' ? 'block' : 'none';
+        });
+    </script>
 {% endblock %}
