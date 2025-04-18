@@ -3,10 +3,7 @@ from app import app
 
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
-from tools.security.redact import redact_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
-from tools.organise.merge import merge_view
-from tools.edit.add_watermark import add_watermark_view
 
 #------------------------- Main Pages -------------------------
 
@@ -22,22 +19,6 @@ def about():
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
-
-@app.route('/all-tools')
-def all_tools():
-    return render_template('all_tools.html')
-
-@app.route('/faq')
-def faq():
-    return render_template('faq.html')
-
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-
-@app.route('/privacy')
-def privacy():
-    return render_template('privacy_policy.html')
 
 @app.route('/optimise')
 def optimise():
@@ -74,10 +55,6 @@ def developer():
 @app.route('/analysis')
 def analysis():
     return render_template('analysis.html')
-
-@app.route('/pricing')
-def pricing():
-    return render_template('pricing.html')
 
 #------------------------- Pages for each feature -------------------------
 
@@ -160,10 +137,6 @@ def pdf_to_excel():
 def pdf_to_pdfa():
     return render_template('pages/convert/pdf_to_pdfa.html')
 
-@app.route('/pages/convert/pdf_to_text')
-def pdf_to_text():
-    return render_template('pages/convert/pdf_to_text.html')
-
 # Creative
 @app.route('/pages/creative/cover_creator')
 def cover_creator():
@@ -195,9 +168,9 @@ def metadata_cleaner():
     return render_template('pages/developer/metadata_cleaner.html')
 
 # Edit
-@app.route('/pages/edit/add_watermark', methods=['GET', 'POST'])
+@app.route('/pages/edit/add_watermark')
 def add_watermark():
-    return add_watermark_view()
+    return render_template('pages/edit/add_watermark.html')
 
 @app.route('/pages/edit/page_numbers')
 def page_numbers():
@@ -206,14 +179,6 @@ def page_numbers():
 @app.route('/pages/edit/edit_content')
 def edit_content():
     return render_template('pages/edit/edit_content.html')
-
-@app.route('/pages/edit/edit_text')
-def edit_text():
-    return render_template('pages/edit/edit_text.html')
-
-@app.route('/pages/edit/annotate')
-def annotate():
-    return render_template('pages/edit/annotate.html')
 
 # Optimise
 @app.route('/pages/optimise/compress')
@@ -233,9 +198,9 @@ def repair():
 def extract():
     return render_template('pages/organise/extract.html')
 
-@app.route('/pages/organise/merge', methods=['get', 'post'])
+@app.route('/pages/organise/merge')
 def merge():
-    return merge_view()
+    return render_template('pages/organise/merge.html')
 
 @app.route('/pages/organise/remove')
 def remove():
@@ -252,14 +217,6 @@ def rotate():
 @app.route('/pages/organise/split')
 def split():
     return render_template('pages/organise/split.html')
-
-@app.route('/pages/organise/reorder')
-def reorder():
-    return render_template('pages/organise/reorder.html')
-
-@app.route('/pages/organise/delete_pages')
-def delete_pages():
-    return render_template('pages/organise/delete_pages.html')
 
 # Security
 @app.route('/pages/security/unlock')
@@ -278,44 +235,19 @@ def sign():
 def compare():
     return render_template('pages/security/compare.html')
 
-@app.route('/pages/security/redact', methods=['GET', 'POST'])
+@app.route('/pages/security/redact')
 def redact():
-    return redact_view()
+    return render_template('pages/security/redact.html')
 
 @app.route('/pages/security/flatten')
 def flatten():
     return render_template('pages/security/flatten.html')
 
-@app.route('/pages/security/password_protect')
-def password_protect():
-    return render_template('pages/security/password_protect.html')
-
-@app.route('/pages/security/digital_signature')
-def digital_signature():
-    return render_template('pages/security/digital_signature.html')
-
-@app.route('/pages/security/remove_password')
-def remove_password():
-    return render_template('pages/security/remove_password.html')
-
 #------------------------- File Uploads -------------------------
 
 @app.route('/pages/optimise/compress', methods=['GET', 'POST'], endpoint='compress_pdf')
-def compress_pdf():
+def compress():
     return compress_view()
-
-# Add these new routes
-@app.route('/terms')
-def terms():
-    return render_template('terms_of_service.html')
-
-@app.route('/cookies')
-def cookies():
-    return render_template('cookies_policy.html')
-
-@app.route('/accessibility-statement')
-def accessibility_statement():
-    return render_template('accessibility_statement.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
