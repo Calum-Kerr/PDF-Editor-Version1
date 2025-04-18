@@ -9,11 +9,11 @@ import os
 import logging
 import fitz  # PyMuPDF
 from app.errors import PDFProcessingError
-from flask import render_template, request, send_file, make_response, jsonify
+from flask import render_template, request, send_file, jsonify
+import tempfile
 from werkzeug.utils import secure_filename
 from pypdf import PdfReader, PdfWriter
 from io import BytesIO
-import re
 import zipfile
 
 # Configure logging
@@ -202,149 +202,103 @@ def split_pdf(input_path, output_dir, split_method='pages', page_ranges=None, ma
         raise PDFProcessingError(f"Failed to split PDF: {str(e)}")
 
 
-def parse_page_ranges(page_ranges_str, max_pages):
-    """
-    Parse a string of page ranges into a list of (start, end) tuples.
-
-    Args:
-        page_ranges_str (str): String containing page ranges, e.g., '1-3,4-6,8'.
-        max_pages (int): Maximum number of pages in the document.
-
-    Returns:
-        list: List of (start, end) tuples representing page ranges.
-
-    Raises:
-        PDFProcessingError: If the page ranges are invalid.
-    """
-    try:
-        ranges = []
-
-        # Split by comma
-        parts = page_ranges_str.split(',')
-
-        for part in parts:
-            part = part.strip()
-
-            if '-' in part:
-                # Range (e.g., '1-3')
-                start, end = part.split('-')
-                start = int(start.strip())
-                end = int(end.strip())
-
-                # Validate range
+def parse_page_ranges(ranges_str, max_pages):
+    """Parse page ranges string into list of page numbers"""
+    pages = set()
+    ranges = ranges_str.replace(' ', '').split(',')
+    
+    for r in ranges:
+        try:
+            if '-' in r:
+                start, end = map(int, r.split('-'))
                 if start < 1 or end > max_pages or start > end:
-                    raise PDFProcessingError(f"Invalid page range: {part}. Valid range is 1-{max_pages}")
-
-                ranges.append((start, end))
+                    raise ValueError
+                pages.update(range(start - 1, end))
             else:
-                # Single page (e.g., '5')
-                page = int(part.strip())
-
-                # Validate page
+                page = int(r)
                 if page < 1 or page > max_pages:
-                    raise PDFProcessingError(f"Invalid page number: {page}. Valid range is 1-{max_pages}")
-
-                ranges.append((page, page))
-
-        return ranges
-
-    except ValueError:
-        raise PDFProcessingError(f"Invalid page range format: {page_ranges_str}. Expected format: '1-3,4-6,8'")
-
-    except PDFProcessingError:
-        # Re-raise PDFProcessingError
-        raise
-
-    except Exception as e:
-        logger.error(f"Error parsing page ranges: {str(e)}")
-        raise PDFProcessingError(f"Failed to parse page ranges: {str(e)}")
+                    raise ValueError
+                pages.add(page - 1)
+        except ValueError:
+            raise ValueError(f"Invalid page range: {r}")
+    
+    return sorted(list(pages))
 
 
 def split_view():
     if request.method == 'POST':
-        # Check if a file was uploaded
-        if 'file' not in request.files:
-            return render_template('pages/organise/split.html', error="No file selected")
+        if 'fileElem' not in request.files:
+            return render_template('pages/organise/split.html', 
+                                error="No file selected")
         
-        file = request.files['file']
+        file = request.files['fileElem']
         
-        # Check if the file is empty
         if file.filename == '':
-            return render_template('pages/organise/split.html', error="No file selected")
-        
-        # Check file extension
-        if not file.filename.lower().endswith('.pdf'):
-            return render_template('pages/organise/split.html', error="Please upload a PDF file")
-
-        try:
-            # Read the PDF
-            pdf = PdfReader(file)
-            total_pages = len(pdf.pages)
+            return render_template('pages/organise/split.html', 
+                                error="No file selected")
             
-            split_type = request.form.get('splitType', 'range')
-            output_pdfs = []
-
-            if split_type == 'individual':
-                # Split each page into a separate PDF
-                for page_num in range(total_pages):
-                    writer = PdfWriter()
-                    writer.add_page(pdf.pages[page_num])
-                    
-                    output = BytesIO()
-                    writer.write(output)
-                    output.seek(0)
-                    output_pdfs.append((f'page_{page_num + 1}.pdf', output))
-
-            else:  # split_type == 'range'
-                page_ranges = request.form.get('pageRanges', '').strip()
-                if not page_ranges:
-                    return render_template('pages/organise/split.html', 
-                                        error="Please specify page ranges")
-
-                # Parse page ranges (e.g., "1-3, 4-6, 7")
-                ranges = page_ranges.split(',')
-                for i, page_range in enumerate(ranges):
-                    writer = PdfWriter()
-                    page_range = page_range.strip()
+        if not file.filename.lower().endswith('.pdf'):
+            return render_template('pages/organise/split.html', 
+                                error="Please upload a PDF file")
+            
+        try:
+            # Read the PDF file
+            pdf_bytes = BytesIO(file.read())
+            pdf_reader = PdfReader(pdf_bytes)
+            total_pages = len(pdf_reader.pages)
+            
+            # Create a ZIP file in memory to store split PDFs
+            zip_buffer = BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                
+                split_type = request.form.get('splitType', 'range')
+                
+                if split_type == 'range':
+                    page_ranges = request.form.get('pageRanges', '').strip()
+                    if not page_ranges:
+                        return render_template('pages/organise/split.html', 
+                                            error="Please specify page ranges")
                     
                     try:
-                        if '-' in page_range:
-                            start, end = map(int, page_range.split('-'))
-                            if start < 1 or end > total_pages or start > end:
-                                raise ValueError
-                            for page_num in range(start - 1, end):
-                                writer.add_page(pdf.pages[page_num])
-                        else:
-                            page_num = int(page_range)
-                            if page_num < 1 or page_num > total_pages:
-                                raise ValueError
-                            writer.add_page(pdf.pages[page_num - 1])
-                            
-                        output = BytesIO()
-                        writer.write(output)
-                        output.seek(0)
-                        output_pdfs.append((f'split_{i + 1}.pdf', output))
-                        
-                    except ValueError:
+                        pages = parse_page_ranges(page_ranges, total_pages)
+                    except ValueError as e:
                         return render_template('pages/organise/split.html', 
-                                            error=f"Invalid page range: {page_range}")
-
-            # Create a zip file containing all split PDFs
-            memory_zip = BytesIO()
-            with zipfile.ZipFile(memory_zip, 'w') as zf:
-                for filename, pdf_bytes in output_pdfs:
-                    zf.writestr(filename, pdf_bytes.getvalue())
+                                            error=str(e))
+                    
+                    # Create PDF for specified range
+                    output = PdfWriter()
+                    for page_num in pages:
+                        output.add_page(pdf_reader.pages[page_num])
+                    
+                    # Save to zip file
+                    pdf_output = BytesIO()
+                    output.write(pdf_output)
+                    pdf_output.seek(0)
+                    zip_file.writestr(f'split_pages_{page_ranges}.pdf', pdf_output.getvalue())
+                    
+                else:  # individual pages
+                    # Split each page into a separate PDF
+                    for page_num in range(total_pages):
+                        output = PdfWriter()
+                        output.add_page(pdf_reader.pages[page_num])
+                        
+                        # Save to zip file
+                        pdf_output = BytesIO()
+                        output.write(pdf_output)
+                        pdf_output.seek(0)
+                        zip_file.writestr(f'page_{page_num + 1}.pdf', pdf_output.getvalue())
             
-            memory_zip.seek(0)
+            # Prepare zip file for download
+            zip_buffer.seek(0)
             return send_file(
-                memory_zip,
+                zip_buffer,
                 mimetype='application/zip',
                 as_attachment=True,
                 download_name='split_pdfs.zip'
             )
-
+            
         except Exception as e:
             return render_template('pages/organise/split.html', 
                                 error=f"Error processing PDF: {str(e)}")
-
+            
     return render_template('pages/organise/split.html')

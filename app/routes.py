@@ -4,6 +4,7 @@ from app import app
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
+from tools.organise.split import split_view
 
 #------------------------- Main Pages -------------------------
 
@@ -214,9 +215,9 @@ def sort():
 def rotate():
     return render_template('pages/organise/rotate.html')
 
-@app.route('/pages/organise/split')
+@app.route('/pages/organise/split', methods=['GET', 'POST'])
 def split():
-    return render_template('pages/organise/split.html')
+    return split_view()
 
 # Security
 @app.route('/pages/security/unlock')
