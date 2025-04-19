@@ -1,4 +1,9 @@
 from flask import render_template, request, send_file
+from werkzeug.utils import secure_filename
+import os
+import tempfile
+from io import BytesIO
+from tools.security.flatten import flatten_pdf
 from app import app
 
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
@@ -7,6 +12,7 @@ from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 from tools.organise.split import split_view
 from tools.organise.merge import merge_view
 from tools.organise.rotate import rotate_view
+from tools.security.flatten import flatten_pdf
 
 
 #------------------------- Main Pages -------------------------
@@ -243,8 +249,87 @@ def compare():
 def redact():
     return render_template('pages/security/redact.html')
 
-@app.route('/pages/security/flatten')
+@app.route('/pages/security/flatten', methods=['GET', 'POST'])
 def flatten():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return render_template('pages/security/flatten.html', 
+                                error="No file selected")
+        
+        file = request.files['file']
+        if file.filename == '':
+            return render_template('pages/security/flatten.html', 
+                                error="No file selected")
+            
+        if not file.filename.lower().endswith('.pdf'):
+            return render_template('pages/security/flatten.html', 
+                                error="Please upload a PDF file")
+        
+        temp_input = None
+        temp_output = None
+        
+        try:
+            # Create temporary files with unique names
+            temp_input = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            temp_output = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            
+            # Close the temporary files immediately to release handles
+            temp_input_path = temp_input.name
+            temp_output_path = temp_output.name
+            temp_input.close()
+            temp_output.close()
+            
+            # Save uploaded file to temp input
+            file.save(temp_input_path)
+            
+            # Get form parameters
+            flatten_annotations = request.form.get('flatten_annotations', 'true').lower() == 'true'
+            flatten_form_fields = request.form.get('flatten_form_fields', 'true').lower() == 'true'
+            
+            # Flatten the PDF
+            result = flatten_pdf(
+                input_path=temp_input_path,
+                output_path=temp_output_path,
+                flatten_annotations=flatten_annotations,
+                flatten_form_fields=flatten_form_fields
+            )
+            
+            # Read the output PDF into memory
+            with open(temp_output_path, 'rb') as f:
+                pdf_data = BytesIO(f.read())
+            
+            # Clean up temporary files
+            try:
+                os.unlink(temp_input_path)
+                os.unlink(temp_output_path)
+            except (PermissionError, OSError) as e:
+                app.logger.warning(f"Failed to delete temporary files: {e}")
+            
+            # Send the flattened PDF
+            return send_file(
+                pdf_data,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=f"flattened_{secure_filename(file.filename)}"
+            )
+            
+        except Exception as e:
+            # Clean up temporary files in case of error
+            if temp_input and os.path.exists(temp_input.name):
+                try:
+                    os.unlink(temp_input.name)
+                except (PermissionError, OSError):
+                    pass
+                    
+            if temp_output and os.path.exists(temp_output.name):
+                try:
+                    os.unlink(temp_output.name)
+                except (PermissionError, OSError):
+                    pass
+                    
+            return render_template('pages/security/flatten.html', 
+                                error=f"Error flattening PDF: {str(e)}")
+    
     return render_template('pages/security/flatten.html')
 
 #------------------------- File Uploads -------------------------
