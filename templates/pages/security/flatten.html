@@ -2,20 +2,49 @@
 {% block title %}Flatten PDF - RevisePDF{% endblock %}
 
 {% block content %}
-<div class="upload-section text-center">
-    <h1 class="mb-3">Flatten PDF</h1>
-    <p class="mb-4">Flatten your PDF to prevent further editing.</p>
-
-    <form method="POST" enctype="multipart/form-data" class="mb-3">
-        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required>
-        <label for="fileInput" class="btn btn-primary select-file-button">
-            Select a file
-        </label>
-    </form>
-
-    <p class="drag-drop-text mt-2">or drag and drop here</p>
-    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
-        Drop files here
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Flatten PDF</h2>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select PDF File</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="flatten_annotations" name="flatten_annotations" value="true" checked>
+                                <label class="form-check-label" for="flatten_annotations">
+                                    Flatten Annotations
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="flatten_form_fields" name="flatten_form_fields" value="true" checked>
+                                <label class="form-check-label" for="flatten_form_fields">
+                                    Flatten Form Fields
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Flatten PDF</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
