@@ -41,34 +41,12 @@
         </div>
     </div>
 
-    <style>
-        .drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .drop-area.dragover {
-            background-color: #e1f5fe;
-            border-color: #2196f3;
-        }
-        .file-list {
-            list-style: none;
-            padding: 0;
-        }
-        .file-list li {
-            margin: 5px 0;
-        }
-    </style>
-
     <script>
         const dropArea = document.getElementById('drop-area');
         const fileElem = document.getElementById('fileElem');
         const fileList = document.getElementById('file-list');
-        const submitBtn = document.getElementById('submitBtn');
         const mergeForm = document.getElementById('mergeForm');
+        const submitBtn = document.getElementById('submitBtn');
 
         // Prevent default drag behaviors
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -85,7 +63,7 @@
             dropArea.addEventListener(eventName, unhighlight, false);
         });
 
-        function preventDefaults (e) {
+        function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
@@ -108,17 +86,63 @@
         }
 
         function handleFiles(files) {
-            fileElem.files = files;
-            updateFileList(files);
+            const validFiles = Array.from(files).filter(file => file.type === 'application/pdf');
+            if (validFiles.length === 0) {
+                alert('Please upload PDF files only');
+                return;
+            }
+
+            // Create a new DataTransfer object
+            const dataTransfer = new DataTransfer();
+            
+            // Add new files to existing files
+            const existingFiles = Array.from(fileElem.files || []);
+            [...existingFiles, ...validFiles].forEach(file => {
+                dataTransfer.items.add(file);
+            });
+
+            // Update the input's files
+            fileElem.files = dataTransfer.files;
+            updateFileList();
         }
 
-        function updateFileList(files) {
+        function updateFileList() {
             fileList.innerHTML = ''; // Clear the list
-            Array.from(files).forEach(file => {
-                const li = document.createElement('li');
-                li.textContent = file.name;
-                fileList.appendChild(li);
+            if (fileElem.files) {
+                Array.from(fileElem.files).forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'd-flex justify-content-between align-items-center mb-2';
+                    
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    li.appendChild(fileName);
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = '×';
+                    removeBtn.className = 'btn btn-sm btn-danger';
+                    removeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        removeFile(index);
+                    };
+                    li.appendChild(removeBtn);
+                    
+                    fileList.appendChild(li);
+                });
+            }
+        }
+
+        function removeFile(index) {
+            const dt = new DataTransfer();
+            const files = Array.from(fileElem.files);
+            
+            files.forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
             });
+            
+            fileElem.files = dt.files;
+            updateFileList();
         }
 
         // Handle click to select files
@@ -148,5 +172,34 @@
             submitBtn.innerHTML = 'Processing...';
         });
     </script>
+
+    <style>
+        .drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border 0.3s ease-in-out;
+        }
+        
+        .drop-area.dragover {
+            border-color: #000;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        
+        .file-list li {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+    </style>
 
 {% endblock %}

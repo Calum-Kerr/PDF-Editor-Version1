@@ -6,6 +6,7 @@ from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 from tools.organise.split import split_view
 from tools.organise.merge import merge_view
+from tools.organise.rotate import rotate_view
 
 
 #------------------------- Main Pages -------------------------
