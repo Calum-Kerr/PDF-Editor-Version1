@@ -1,34 +1,52 @@
 {% extends 'base.html' %}
-{% block title %}JPG to PDF - RevisePDF{% endblock %}
+{% block title %}Convert JPG to PDF - RevisePDF{% endblock %}
 
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="mb-0">.jpg to .pdf</h2>
-                    </div>
-                    <div class="card-body">
-                        <p class="lead">Convert a .jpg to a .pdf</p>
-
-                        {% if error %}
-                        <div class="alert alert-danger">{{ error }}</div>
-                        {% endif %}
-
-                        <form method="POST" enctype="multipart/form-data">
-                            <div class="mb-3">
-                                <label for="file" class="form-label">Select .jpg File</label>
-                                <input type="file" class="form-control" id="file" name="file" accept=".jpg" required>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn border border-secondary">Convert .jpg to .pdf</button>
-                            </div>
-                        </form>
-                    </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Convert JPG to PDF</h2>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select Image File</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".jpg,.jpeg,.png" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="page_size" class="form-label">Page Size</label>
+                            <select class="form-select" id="page_size" name="page_size">
+                                <option value="a4">A4</option>
+                                <option value="letter">Letter</option>
+                                <option value="legal">Legal</option>
+                                <option value="a3">A3</option>
+                                <option value="a5">A5</option>
+                                <option value="original">Original Image Size</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="orientation" class="form-label">Orientation</label>
+                            <select class="form-select" id="orientation" name="orientation">
+                                <option value="portrait">Portrait</option>
+                                <option value="landscape">Landscape</option>
+                            </select>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Convert to PDF</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}
