@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import render_template, request, send_file
 from werkzeug.utils import secure_filename
 from io import BytesIO
 from pypdf import PdfWriter, PdfReader
@@ -28,12 +28,21 @@ def merge_view():
                             merger.add_page(page)
                     except Exception as e:
                         print(f"Error processing {file.filename}: {e}")
-                        continue
+                        return render_template('pages/organise/merge.html', 
+                                            error=f"Error processing {file.filename}: {str(e)}")
 
             output_buffer = BytesIO()
             merger.write(output_buffer)
             output_buffer.seek(0)
 
-            return send_file(output_buffer, download_name=output_filename, as_attachment=True)
+            return send_file(
+                output_buffer,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=output_filename
+            )
+
+        return render_template('pages/organise/merge.html', 
+                             error="No files were uploaded")
 
     return render_template('pages/organise/merge.html')
