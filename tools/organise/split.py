@@ -1,3 +1,63 @@
+
+from flask import render_template, request, send_file
+from werkzeug.utils import secure_filename
+from io import BytesIO
+from pypdf import PdfWriter, PdfReader
+import os
+import tempfile
+import zipfile
+
+def split_view():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return render_template('pages/organise/split.html', 
+                                error="No file selected")
+        
+        file = request.files['file']
+        if file.filename == '':
+            return render_template('pages/organise/split.html', 
+                                error="No file selected")
+            
+        if not file.filename.lower().endswith('.pdf'):
+            return render_template('pages/organise/split.html', 
+                                error="Please upload a PDF file")
+
+        try:
+            pdf_reader = PdfReader(BytesIO(file.read()))
+            
+            # Create a temporary directory to store split PDFs
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # Split the PDF - one file per page
+                for page_num in range(len(pdf_reader.pages)):
+                    pdf_writer = PdfWriter()
+                    pdf_writer.add_page(pdf_reader.pages[page_num])
+                    
+                    output_filename = f"page_{page_num + 1}.pdf"
+                    output_path = os.path.join(temp_dir, output_filename)
+                    
+                    with open(output_path, 'wb') as output_file:
+                        pdf_writer.write(output_file)
+                
+                # Create a ZIP file containing all split PDFs
+                zip_buffer = BytesIO()
+                with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                    for filename in os.listdir(temp_dir):
+                        file_path = os.path.join(temp_dir, filename)
+                        zip_file.write(file_path, filename)
+                
+                zip_buffer.seek(0)
+                return send_file(
+                    zip_buffer,
+                    mimetype='application/zip',
+                    as_attachment=True,
+                    download_name=f"split_{secure_filename(file.filename)}.zip"
+                )
+
+        except Exception as e:
+            return render_template('pages/organise/split.html', 
+                                error=f"Error splitting PDF: {str(e)}")
+
+    return render_template('pages/organise/split.html')
 """
 PDF Split Module
 

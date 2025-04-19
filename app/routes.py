@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request, send_file
 from app import app
 
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
@@ -6,6 +6,7 @@ from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
 from tools.organise.split import split_view
 from tools.organise.merge import merge_view
+
 
 #------------------------- Main Pages -------------------------
 
@@ -212,9 +213,9 @@ def remove():
 def sort():
     return render_template('pages/organise/sort.html')
 
-@app.route('/pages/organise/rotate')
+@app.route('/pages/organise/rotate', methods=['GET', 'POST'])
 def rotate():
-    return render_template('pages/organise/rotate.html')
+    return rotate_view()
 
 @app.route('/pages/organise/split', methods=['GET', 'POST'])
 def split():
