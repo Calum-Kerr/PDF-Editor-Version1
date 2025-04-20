@@ -1,4 +1,4 @@
-from flask import render_template, request, send_file, current_app, flash, redirect, url_for
+from flask import render_template, request, send_file, jsonify
 from app.forms.security import ProtectPDFForm  # Updated from 'forms.security' to 'app.forms.security'
 from tools.security.protect import protect_pdf
 from werkzeug.utils import secure_filename
@@ -7,6 +7,7 @@ import tempfile
 from io import BytesIO
 from tools.security.flatten import flatten_pdf
 from app import app
+from app.errors import PDFProcessingError
 
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
@@ -15,7 +16,7 @@ from tools.organise.split import split_view
 from tools.organise.merge import merge_view
 from tools.organise.rotate import rotate_view
 from tools.security.flatten import flatten_pdf
-
+from tools.security.unlock import unlock_pdf  # Import the existing unlock function
 
 #------------------------- Main Pages -------------------------
 
@@ -231,8 +232,46 @@ def split():
     return split_view()
 
 # Security
-@app.route('/pages/security/unlock')
+@app.route('/pages/security/unlock', methods=['GET', 'POST'])
 def unlock():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'})
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'})
+            
+        password = request.form.get('password')
+        if not password:
+            return jsonify({'error': 'Password is required'})
+            
+        if not file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'Please upload a PDF file'})
+            
+        try:
+            # Create input stream from uploaded file
+            input_stream = BytesIO(file.read())
+            
+            # Use the unlock_pdf function
+            try:
+                output_stream = unlock_pdf(input_stream, password)
+                
+                # Send the unlocked PDF back to the user
+                return send_file(
+                    output_stream,
+                    mimetype='application/pdf',
+                    as_attachment=True,
+                    download_name=f"unlocked_{secure_filename(file.filename)}"
+                )
+            finally:
+                input_stream.close()
+                
+        except PDFProcessingError as e:
+            return jsonify({'error': str(e)})
+        except Exception as e:
+            return jsonify({'error': f"An unexpected error occurred: {str(e)}"})
+            
     return render_template('pages/security/unlock.html')
 
 @app.route('/pages/security/protect', methods=['GET', 'POST'])
