@@ -2,99 +2,208 @@
 {% block title %}Protect PDF - RevisePDF{% endblock %}
 
 {% block content %}
-<div class="upload-section text-center">
-    <h1 class="mb-3">Protect PDF</h1>
-    <p class="mb-4">Add password protection to your PDF file.</p>
+<div class="container">
+    <div class="upload-section text-center">
+        <h1 class="display-5 mb-2">Protect PDF</h1>
+        <p class="lead text-muted mb-5">Add password protection and set permissions for your PDF file</p>
 
-    <form action="{{ url_for('protect') }}" method="POST" enctype="multipart/form-data" id="protectForm">
-        <div id="drop-area" class="drop-area mb-3">
-            <p>Drag & Drop PDF file here or click to select</p>
-            <input type="file" name="file" id="fileInput" class="d-none" accept=".pdf" required>
-            <span id="selectedFileName" class="d-block mt-2"></span>
-        </div>
-
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <input type="password" name="user_password" class="form-control" 
-                           placeholder="User Password (required to open PDF)" required>
-                </div>
-                <div class="mb-3">
-                    <input type="password" name="owner_password" class="form-control" 
-                           placeholder="Owner Password (optional, for full access)">
-                </div>
-
-                <div class="mb-4">
-                    <h5 class="mb-3">Permissions</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowPrint" name="allow_print" checked>
-                                <label class="form-check-label" for="allowPrint">Allow Printing</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowCopy" name="allow_copy" checked>
-                                <label class="form-check-label" for="allowCopy">Allow Copying</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowModify" name="allow_modify">
-                                <label class="form-check-label" for="allowModify">Allow Modification</label>
-                            </div>
+        <form action="{{ url_for('protect') }}" method="POST" enctype="multipart/form-data" id="protectForm">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div id="drop-area" class="drop-area mb-4">
+                        <div class="drop-icon mb-3">
+                            <i class="fas fa-file-pdf fa-3x text-primary"></i>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowAnnotate" name="allow_annotate" checked>
-                                <label class="form-check-label" for="allowAnnotate">Allow Annotations</label>
+                        <p class="drop-text">Drag & Drop PDF file here</p>
+                        <p class="drop-text-small">or</p>
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2">Choose File</button>
+                        <input type="file" name="file" id="fileInput" class="d-none" accept=".pdf" required>
+                        <span id="selectedFileName" class="selected-file mt-3"></span>
+                    </div>
+
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="password-section bg-light p-4 rounded-3 mb-4">
+                                <h5 class="mb-4"><i class="fas fa-lock me-2"></i>Password Settings</h5>
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-lock"></i></span>
+                                        <input type="password" name="user_password" id="user_password" 
+                                               class="form-control" placeholder="User Password (required to open PDF)" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                        <input type="password" name="owner_password" id="owner_password" 
+                                               class="form-control" placeholder="Owner Password (optional, for full access)">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowForms" name="allow_forms" checked>
-                                <label class="form-check-label" for="allowForms">Allow Form Filling</label>
-                            </div>
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="allowAssemble" name="allow_assemble">
-                                <label class="form-check-label" for="allowAssemble">Allow Document Assembly</label>
+
+                            <div class="permissions-section bg-light p-4 rounded-3 mb-4">
+                                <h5 class="mb-4"><i class="fas fa-key me-2"></i>Permission Settings</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowPrint" name="allow_print" checked>
+                                                <label class="form-check-label" for="allowPrint">
+                                                    <i class="fas fa-print me-2"></i>Allow Printing
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowCopy" name="allow_copy" checked>
+                                                <label class="form-check-label" for="allowCopy">
+                                                    <i class="fas fa-copy me-2"></i>Allow Copying
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowModify" name="allow_modify">
+                                                <label class="form-check-label" for="allowModify">
+                                                    <i class="fas fa-edit me-2"></i>Allow Modification
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowAnnotate" name="allow_annotate" checked>
+                                                <label class="form-check-label" for="allowAnnotate">
+                                                    <i class="fas fa-comment-alt me-2"></i>Allow Annotations
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowForms" name="allow_forms" checked>
+                                                <label class="form-check-label" for="allowForms">
+                                                    <i class="fas fa-wpforms me-2"></i>Allow Form Filling
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="permission-item">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" class="form-check-input" id="allowAssemble" name="allow_assemble">
+                                                <label class="form-check-label" for="allowAssemble">
+                                                    <i class="fas fa-object-group me-2"></i>Allow Assembly
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                        <i class="fas fa-lock me-2"></i>Protect PDF
+                    </button>
                 </div>
-
-                <button type="submit" class="btn btn-success" id="submitBtn">
-                    Protect PDF
-                </button>
             </div>
-        </div>
-    </form>
+        </form>
 
-    <div id="messageArea" class="mt-3"></div>
+        <div id="messageArea" class="mt-3"></div>
+    </div>
 </div>
 
 <style>
+.upload-section {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
 .drop-area {
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    padding: 2rem;
+    border: 2px dashed var(--primary-color);
+    border-radius: 12px;
+    padding: 2.5rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    background-color: #f8f9fa;
-    margin: 0 auto;
-    max-width: 500px;
+    background-color: rgba(35, 130, 135, 0.05);
 }
 
 .drop-area.dragover {
-    border-color: #0d6efd;
-    background-color: #e9ecef;
+    border-color: var(--primary-color);
+    background-color: rgba(35, 130, 135, 0.1);
+    transform: scale(1.02);
 }
 
-.drop-area p {
+.drop-icon {
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.drop-text {
+    font-size: 1.2rem;
+    color: var(--text-dark);
     margin: 0;
-    font-size: 1.1rem;
-    color: #6c757d;
 }
 
-#selectedFileName {
-    color: #495057;
+.drop-text-small {
     font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0.5rem 0;
+}
+
+.selected-file {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(35, 130, 135, 0.1);
+    border-radius: 4px;
+    color: var(--text-dark);
+    font-size: 0.9rem;
+}
+
+.password-section, .permissions-section {
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.permission-item {
+    padding: 0.5rem 0;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.input-group-text {
+    background-color: rgba(35, 130, 135, 0.1);
+    border-color: rgba(0,0,0,0.1);
+    color: var(--primary-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.alert {
+    max-width: 500px;
+    margin: 1rem auto;
 }
 </style>
 
@@ -106,6 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileNameSpan = document.getElementById('selectedFileName');
     const messageArea = document.getElementById('messageArea');
     const submitBtn = document.getElementById('submitBtn');
+    const chooseFileBtn = dropArea.querySelector('button');
 
     // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -152,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle click to select files
-    dropArea.addEventListener('click', (e) => {
+    chooseFileBtn.addEventListener('click', (e) => {
         fileInput.click();
     });
 
@@ -165,11 +275,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function updateFileName(name) {
-        fileNameSpan.textContent = name;
+        if (name) {
+            fileNameSpan.innerHTML = `<i class="fas fa-file-pdf me-2"></i>${name}`;
+            fileNameSpan.style.display = 'inline-block';
+        } else {
+            fileNameSpan.textContent = '';
+            fileNameSpan.style.display = 'none';
+        }
     }
 
     function showMessage(message, type) {
-        messageArea.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        messageArea.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
     }
 
     form.addEventListener('submit', async function(e) {
