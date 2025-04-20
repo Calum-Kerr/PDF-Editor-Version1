@@ -1,4 +1,6 @@
-from flask import render_template, request, send_file
+from flask import render_template, request, send_file, current_app, flash, redirect, url_for, jsonify
+from forms.security import ProtectPDFForm
+from tools.security.protect import protect_pdf
 from werkzeug.utils import secure_filename
 import os
 import tempfile
@@ -233,8 +235,63 @@ def split():
 def unlock():
     return render_template('pages/security/unlock.html')
 
-@app.route('/pages/security/protect')
+@app.route('/pages/security/protect', methods=['GET', 'POST'])
 def protect():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'})
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'})
+
+        # Get form data
+        user_password = request.form.get('user_password')
+        owner_password = request.form.get('owner_password')
+        
+        if not all([user_password, owner_password]):
+            return jsonify({'error': 'Passwords are required'})
+
+        if not file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'Please upload a PDF file'})
+
+        try:
+            # Read the uploaded file into memory
+            pdf_data = BytesIO(file.read())
+            
+            # Create a temporary file for the output
+            output_pdf = BytesIO()
+            
+            # Protect the PDF
+            protect_pdf(
+                input_stream=pdf_data,
+                output_stream=output_pdf,
+                user_password=user_password,
+                owner_password=owner_password
+            )
+            
+            # Seek to the beginning of the output stream
+            output_pdf.seek(0)
+            
+            # Prepare the response
+            response = send_file(
+                output_pdf,
+                mimetype='application/pdf',
+                as_attachment=True,
+                download_name=f"protected_{secure_filename(file.filename)}"
+            )
+            
+            # Add headers to prevent caching
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            
+            return response
+
+        except Exception as e:
+            app.logger.error(f"Error protecting PDF: {str(e)}")
+            return jsonify({'error': f"Error protecting PDF: {str(e)}"})
+
     return render_template('pages/security/protect.html')
 
 @app.route('/pages/security/sign')
