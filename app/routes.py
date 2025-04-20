@@ -1,5 +1,5 @@
-from flask import render_template, request, send_file, current_app, flash, redirect, url_for, jsonify
-from forms.security import ProtectPDFForm
+from flask import render_template, request, send_file, current_app, flash, redirect, url_for
+from app.forms.security import ProtectPDFForm  # Updated from 'forms.security' to 'app.forms.security'
 from tools.security.protect import protect_pdf
 from werkzeug.utils import secure_filename
 import os
