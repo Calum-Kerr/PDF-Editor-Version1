@@ -1,33 +1,47 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, SelectField, SubmitField, PasswordField
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms import FileField, SelectField, IntegerField, StringField, SubmitField
+from wtforms.validators import DataRequired, NumberRange, Optional
 
-class ImageToPdfForm(FlaskForm):
-    class Meta:
-        csrf = False  # Disable CSRF protection for this form
-        
-    file = FileField('Select Image File', validators=[DataRequired()])
-    page_size = SelectField('Page Size', choices=[
-        ('a4', 'A4'),
-        ('letter', 'Letter'),
-        ('legal', 'Legal'),
-        ('a3', 'A3'),
-        ('a5', 'A5'),
-        ('original', 'Original Image Size')
+class PageNumbersForm(FlaskForm):
+    file = FileField('PDF File', validators=[DataRequired()])
+    
+    position = SelectField('Position', choices=[
+        ('top-left', 'Top Left'),
+        ('top-center', 'Top Center'),
+        ('top-right', 'Top Right'),
+        ('bottom-left', 'Bottom Left'),
+        ('bottom-center', 'Bottom Center'),
+        ('bottom-right', 'Bottom Right')
     ])
-    orientation = SelectField('Orientation', choices=[
-        ('portrait', 'Portrait'),
-        ('landscape', 'Landscape')
+    
+    font = SelectField('Font', choices=[
+        ('helv', 'Helvetica'),
+        ('tiro', 'Times Roman'),
+        ('cour', 'Courier'),
+        ('times', 'Times New Roman')
     ])
-    submit = SubmitField('Convert to PDF')
-
-# Update ProtectPDFForm similarly
-class ProtectPDFForm(FlaskForm):
-    class Meta:
-        csrf = False  # Disable CSRF protection for this form
-        
-    file = FileField('Select PDF File', validators=[DataRequired()])
-    user_password = PasswordField('User Password', validators=[Length(min=1, max=32)])
-    owner_password = PasswordField('Owner Password', validators=[Length(min=1, max=32)])
-    confirm_password = PasswordField('Confirm User Password', 
-                                   validators=[EqualTo('user_password', message='Passwords must match')])
+    
+    font_size = IntegerField('Font Size', 
+        validators=[NumberRange(min=6, max=72)],
+        default=10
+    )
+    
+    start_number = IntegerField('Start Number',
+        validators=[NumberRange(min=1)],
+        default=1
+    )
+    
+    prefix = StringField('Prefix', validators=[Optional()])
+    suffix = StringField('Suffix', validators=[Optional()])
+    
+    margin = IntegerField('Margin',
+        validators=[NumberRange(min=0, max=144)],
+        default=36
+    )
+    
+    pages = StringField('Pages to Number',
+        validators=[Optional()],
+        default=''  # Changed from 'all' to empty string
+    )
+    
+    submit = SubmitField('Add Page Numbers')
