@@ -1,1 +1,4 @@
-# This file can be empty - it just marks the directory as a Python package
+from app.forms.edit import PageNumbersForm
+from app.forms.security import ProtectPDFForm
+
+__all__ = ['PageNumbersForm', 'ProtectPDFForm']
