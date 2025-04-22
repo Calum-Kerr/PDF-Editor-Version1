@@ -1,5 +1,6 @@
-from flask import render_template, request, send_file, jsonify
-from app.forms.security import ProtectPDFForm  # Updated from 'forms.security' to 'app.forms.security'
+from flask import render_template, request, send_file, jsonify, flash, redirect, url_for, session
+from app.forms.security import ProtectPDFForm
+from app.forms.edit import PageNumbersForm
 from tools.security.protect import protect_pdf
 from werkzeug.utils import secure_filename
 import os
@@ -17,6 +18,7 @@ from tools.organise.merge import merge_view
 from tools.organise.rotate import rotate_view
 from tools.security.flatten import flatten_pdf
 from tools.security.unlock import unlock_pdf  # Import the existing unlock function
+from tools.edit.page_numbers import add_page_numbers, get_font_name, get_position_name
 
 #------------------------- Main Pages -------------------------
 
@@ -24,6 +26,10 @@ from tools.security.unlock import unlock_pdf  # Import the existing unlock funct
 def index():
     print("Rendering index.html")
     return render_template('index.html')
+
+@app.route('/pages/edit/content')
+def edit_content():
+    return render_template('pages/edit/edit_content.html')
 
 @app.route('/about')
 def about():
@@ -185,13 +191,108 @@ def metadata_cleaner():
 def add_watermark():
     return render_template('pages/edit/add_watermark.html')
 
-@app.route('/pages/edit/page_numbers')
+@app.route('/pages/edit/page-numbers', methods=['GET', 'POST'])
 def page_numbers():
-    return render_template('pages/edit/page_numbers.html')
+    form = PageNumbersForm()
+    
+    if form.validate_on_submit():
+        try:
+            file = form.file.data
+            if not file:
+                flash('No file selected.', 'error')
+                return render_template('pages/edit/page_numbers.html', form=form)
+                
+            # Create temporary input and output files
+            input_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            output_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            
+            # Save uploaded file
+            file.save(input_file.name)
+            input_file.close()
+            output_file.close()
+            
+            # Process the PDF
+            result = add_page_numbers(
+                input_path=input_file.name,
+                output_path=output_file.name,
+                position=form.position.data,
+                font_name=form.font.data,
+                font_size=form.font_size.data,
+                start_number=form.start_number.data,
+                prefix=form.prefix.data,
+                suffix=form.suffix.data,
+                margin=form.margin.data,
+                pages=form.pages.data
+            )
+            
+            # Clean up input file
+            try:
+                os.unlink(input_file.name)
+            except (OSError, FileNotFoundError):
+                pass
+            
+            # Get display names for position and font
+            position_name = get_position_name(form.position.data)
+            font_name = get_font_name(form.font.data)
+            
+            # Store the output filename and path in session
+            session['numbered_pdf'] = output_file.name
+            session['original_filename'] = secure_filename(file.filename)
+            
+            return render_template('pages/edit/page_numbers.html',
+                                 form=form,
+                                 result=result,
+                                 position_name=position_name,
+                                 font_name=font_name)
+                                 
+        except Exception as e:
+            flash(f'Error processing PDF: {str(e)}', 'error')
+            return render_template('pages/edit/page_numbers.html', form=form)
+            
+    return render_template('pages/edit/page_numbers.html', form=form)  # Removed error_message, result, output_filename, position_name, font_name
 
-@app.route('/pages/edit/edit_content')
-def edit_content():
-    return render_template('pages/edit/edit_content.html')
+@app.route('/download-numbered-pdf')
+def download_numbered_pdf():
+    """Download the numbered PDF file."""
+    if 'numbered_pdf' not in session:
+        flash('No numbered PDF file found.', 'error')
+        return redirect(url_for('page_numbers'))
+        
+    try:
+        # Get the file path from session
+        file_path = session.get('numbered_pdf')
+        
+        # Verify the file exists
+        if not os.path.exists(file_path):
+            flash('File not found.', 'error')
+            return redirect(url_for('page_numbers'))
+            
+        # Get the original filename from session
+        filename = session.get('original_filename', 'numbered.pdf')
+        if not filename.lower().endswith('.pdf'):
+            filename += '.pdf'
+        safe_filename = secure_filename(f'numbered_{filename}')
+            
+        # Send the file
+        return send_file(
+            file_path,
+            as_attachment=True,
+            download_name=safe_filename,
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        flash(f'Error downloading file: {str(e)}', 'error')
+        return redirect(url_for('page_numbers'))
+    finally:
+        # Clean up the temporary file
+        try:
+            if 'numbered_pdf' in session:
+                os.unlink(session['numbered_pdf'])
+                session.pop('numbered_pdf')
+                session.pop('original_filename', None)
+        except (OSError, FileNotFoundError):
+            pass
 
 # Optimise
 @app.route('/pages/optimise/compress')
