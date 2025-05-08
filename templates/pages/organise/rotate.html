@@ -1,6 +1,153 @@
 {% extends 'base.html' %}
 {% block title %}Rotate Pages - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Rotate Pages</h1>
-    <p>Rotate pages within your PDF document.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Rotate Pages</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Rotate pages within your PDF document.</p>
+
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data" id="rotateForm">
+                        <div class="mb-3">
+                            <input type="file" name="fileInput" id="fileInput" accept=".pdf" class="d-none">
+                            <div id="drop-area" class="drop-area">
+                                <p>Drag & Drop PDF file here or click to select</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rotation Angle</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="rotation" id="rotate90" value="90" checked>
+                                <label class="btn btn-outline-primary" for="rotate90">90° Clockwise</label>
+
+                                <input type="radio" class="btn-check" name="rotation" id="rotate180" value="180">
+                                <label class="btn btn-outline-primary" for="rotate180">180°</label>
+
+                                <input type="radio" class="btn-check" name="rotation" id="rotate270" value="270">
+                                <label class="btn btn-outline-primary" for="rotate270">90° Counterclockwise</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pages" class="form-label">Pages to Rotate</label>
+                            <input type="text" class="form-control" id="pages" name="pages" 
+                                   placeholder="e.g., 1,3,5-7 (leave empty for all pages)" value="all">
+                            <div class="form-text">Enter page numbers and/or ranges separated by commas</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Rotate PDF</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .drop-area {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .drop-area.dragover {
+        background-color: #e1f5fe;
+        border-color: #2196f3;
+    }
+</style>
+
+<script>
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('fileInput');
+    const rotateForm = document.getElementById('rotateForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function preventDefaults (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropArea.classList.add('dragover');
+    }
+
+    function unhighlight(e) {
+        dropArea.classList.remove('dragover');
+    }
+
+    // Handle dropped files
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0 && files[0].type === 'application/pdf') {
+            fileInput.files = files;
+            updateFileName(files[0].name);
+        } else {
+            alert('Please upload a PDF file');
+        }
+    }
+
+    // Handle click to select files
+    dropArea.addEventListener('click', (e) => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            if (e.target.files[0].type === 'application/pdf') {
+                updateFileName(e.target.files[0].name);
+            } else {
+                alert('Please upload a PDF file');
+                fileInput.value = '';
+            }
+        }
+    });
+
+    function updateFileName(filename) {
+        dropArea.innerHTML = `<p>Selected file: ${filename}</p>`;
+    }
+
+    // Form submission
+    rotateForm.addEventListener('submit', function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            alert('Please select a PDF file first');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Processing...';
+    });
+</script>
 {% endblock %}

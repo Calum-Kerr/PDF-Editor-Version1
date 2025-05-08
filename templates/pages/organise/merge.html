@@ -1,6 +1,205 @@
 {% extends 'base.html' %}
 {% block title %}Merge PDF - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Merge PDF</h1>
-    <p>Combine multiple PDFs into a single document.</p>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">Merge PDF</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Merge uploaded PDF files into one file.</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+
+                        <form method="POST" enctype="multipart/form-data" id="mergeForm">
+                            <div class="mb-3">
+                                <div id="drop-area" class="drop-area">
+                                    <p>Drag & Drop PDF files here or click to select</p>
+                                    <input type="file" id="fileElem" name="files" multiple accept="application/pdf" style="display:none">
+                                </div>
+                                <ul id="file-list" class="file-list"></ul>
+                            </div>
+                            <div class="mb-3">
+                                <label for="outputFilename" class="form-label">Output File Name</label>
+                                <input type="text" class="form-control" id="outputFilename" name="outputFilename" 
+                                       placeholder="Enter filename (optional)">
+                                <div class="form-text">If left empty, the file will be saved as 'merged.pdf'</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="submitBtn">Merge PDF</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileElem = document.getElementById('fileElem');
+        const fileList = document.getElementById('file-list');
+        const mergeForm = document.getElementById('mergeForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            dropArea.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('dragover');
+        }
+
+        // Handle dropped files
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const validFiles = Array.from(files).filter(file => file.type === 'application/pdf');
+            if (validFiles.length === 0) {
+                alert('Please upload PDF files only');
+                return;
+            }
+
+            // Create a new DataTransfer object
+            const dataTransfer = new DataTransfer();
+            
+            // Add new files to existing files
+            const existingFiles = Array.from(fileElem.files || []);
+            [...existingFiles, ...validFiles].forEach(file => {
+                dataTransfer.items.add(file);
+            });
+
+            // Update the input's files
+            fileElem.files = dataTransfer.files;
+            updateFileList();
+        }
+
+        function updateFileList() {
+            fileList.innerHTML = ''; // Clear the list
+            if (fileElem.files) {
+                Array.from(fileElem.files).forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'd-flex justify-content-between align-items-center mb-2';
+                    
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    li.appendChild(fileName);
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = '×';
+                    removeBtn.className = 'btn btn-sm btn-danger';
+                    removeBtn.onclick = (e) => {
+                        e.preventDefault();
+                        removeFile(index);
+                    };
+                    li.appendChild(removeBtn);
+                    
+                    fileList.appendChild(li);
+                });
+            }
+        }
+
+        function removeFile(index) {
+            const dt = new DataTransfer();
+            const files = Array.from(fileElem.files);
+            
+            files.forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
+            });
+            
+            fileElem.files = dt.files;
+            updateFileList();
+        }
+
+        // Handle click to select files
+        dropArea.addEventListener('click', (e) => {
+            fileElem.click();
+        });
+
+        fileElem.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        // Form submission
+        mergeForm.addEventListener('submit', function(e) {
+            if (!fileElem.files || fileElem.files.length === 0) {
+                e.preventDefault();
+                alert('Please select PDF files first');
+                return;
+            }
+
+            if (fileElem.files.length < 2) {
+                e.preventDefault();
+                alert('Please select at least 2 PDF files to merge');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Processing...';
+        });
+    </script>
+
+    <style>
+        .drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border 0.3s ease-in-out;
+        }
+        
+        .drop-area.dragover {
+            border-color: #000;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        
+        .file-list li {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+    </style>
+
 {% endblock %}

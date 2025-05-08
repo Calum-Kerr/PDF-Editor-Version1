@@ -1,6 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}PDF to Panoramic - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>PDF to Panoramic</h1>
-    <p>Generate a panoramic view from your PDF pages.</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="mb-0">PDF to Panoramic</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Generate a panoramic view by stitching PDF pages side by side.</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Select PDF File</label>
+                                <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="direction" class="form-label">Stitching Direction</label>
+                                <select class="form-select" id="direction" name="direction">
+                                    <option value="horizontal" selected>Horizontal (Pages Side by Side)</option>
+                                    <option value="vertical">Vertical (Pages Stacked)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="page_range" class="form-label">Page Range (Optional)</label>
+                                <input type="text" class="form-control" id="page_range" name="page_range"
+                                       placeholder="e.g., 1-3,5,7-9 (leave empty for all pages)">
+                                <div class="form-text text-muted">
+                                    Specify pages to include (e.g., 1-3,5,7-9). Leave empty to include all pages.
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn border border-secondary">Create Panoramic PDF</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer">
+                        <h5>How It Works</h5>
+                        <ul>
+                            <li>Upload your PDF file</li>
+                            <li>Choose horizontal or vertical stitching</li>
+                            <li>Optionally select specific pages to include</li>
+                            <li>The output will be a new PDF with pages stitched together</li>
+                        </ul>
+
+                        <div class="alert">
+                            <h5>Tips for Best Results</h5>
+                            <ul>
+                                <li>For large documents, consider selecting just a few pages to include</li>
+                                <li>Horizontal stitching works best for documents with similar page heights</li>
+                                <li>Vertical stitching works best for documents with similar page widths</li>
+                                <li>Quality is preserved, but very large panoramas might increase file size</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

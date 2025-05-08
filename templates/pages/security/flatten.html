@@ -1,6 +1,50 @@
 {% extends 'base.html' %}
 {% block title %}Flatten PDF - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Flatten PDF</h1>
-    <p>Flatten your PDF to prevent further editing.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Flatten PDF</h2>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                    <div class="alert alert-danger">{{ error }}</div>
+                    {% endif %}
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select PDF File</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".pdf" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="flatten_annotations" name="flatten_annotations" value="true" checked>
+                                <label class="form-check-label" for="flatten_annotations">
+                                    Flatten Annotations
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="flatten_form_fields" name="flatten_form_fields" value="true" checked>
+                                <label class="form-check-label" for="flatten_form_fields">
+                                    Flatten Form Fields
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Flatten PDF</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,6 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}Code to Flowchart - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Code to Flowchart</h1>
-    <p>Convert your code into a visual flowchart representation.</p>
+<div class="upload-section text-center">
+    <h1 class="mb-3">Code to Flowchart</h1>
+    <p class="mb-4">Convert your code into a visual flowchart representation.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-3">
+        <!-- Assuming code files are accepted, adjust if needed -->
+        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".py,.js,.java,.c,.cpp,.cs,.php,.rb,.go,.swift,text/plain" required>
+        <label for="fileInput" class="btn btn-primary select-file-button">
+            Select code file(s)
+        </label>
+    </form>
+
+    <p class="drag-drop-text mt-2">or drag and drop here</p>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
+        Drop files here
+    </div>
+</div>
 {% endblock %}

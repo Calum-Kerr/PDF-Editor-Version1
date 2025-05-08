@@ -8,60 +8,496 @@
         <meta name="keywords" content="edit PDF, PDF editor, online PDF tools, merge PDFs, compress PDFs, OCR PDFs">
         <meta name="author" content="RevisePDF">
         <link rel="canonical" href="https://www.revisepdf.com/">
+        <!-- Removed commented out and redundant links -->
+        <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}" />
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon-96x96.png') }}" sizes="96x96" />
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}" />
+        <meta name="apple-mobile-web-app-title" content="RevisePDF" />
+        <link rel="manifest" href="{{ url_for('static', filename='img/site.webmanifest') }}" />
+
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <!-- Removed duplicate Bootstrap and Font Awesome links from here -->
         <style>
-            body { min-height: 100vh; display: flex; flex-direction: column; }
-            main { flex: 1 0 auto; padding: 2rem 0; }
-            .navbar-brand { font-size: 1.5rem; font-weight: 600; color: #333; }
-            .nav-link { font-weight: 500; color: #666; transition: color 0.2s ease; }
-            .nav-link:hover { color: #333; }
-            .footer { margin-top: auto; background-color: #2d3748; color: #fff; padding: 1.5rem 0; }
+            :root {
+                --primary-color: #238287;
+                --secondary-color: #FFFFFF;
+                --tertiary-color: #C8C8C8;
+                --primary-dark: #1a6569;
+                --primary-light: #2a9da3;
+                --text-dark: #333333;
+                --text-light: #555555;
+            }
+            
+            body { 
+                min-height: 100vh; 
+                display: flex; 
+                flex-direction: column;
+                background-color: var(--secondary-color);
+                color: var(--text-dark);
+            }
+            main { 
+                flex: 1 0 auto; 
+                padding: 2rem 0; 
+            }
+            .navbar { 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+                padding: 0.75rem 0; 
+                height: 70px;
+                background-color: var(--secondary-color) !important;
+                position: relative;
+                z-index: 1030;
+            }
+            .navbar-container {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr;
+                align-items: center;
+                width: 100%;
+            }
+            .logo-placeholder {
+                display: flex;
+                
+                justify-content: flex-start;
+                width: 35px;
+                height: 35px;
+            }
+            .title-brand {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--primary-color);
+                text-align: center;
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+            .title-brand:hover {
+                color: var(--primary-dark);
+                text-decoration: none;
+            }
+            .tools-container {
+                display: flex;
+                justify-content: flex-end;
+            }
+            
+            /* Full-width mega menu styling */
+            .mega-menu-wrapper {
+                position: absolute;
+                left: 0;
+                right: 0;
+                width: 100%;
+                top: 70px;
+                background-color: var(--secondary-color);
+                border-top: 1px solid var(--tertiary-color);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+                z-index: 1020;
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            
+            .mega-menu-wrapper.show {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            .mega-menu-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            
+            .mega-menu-grid {
+                display: grid;
+                grid-template-columns: repeat(6, 1fr);
+                grid-gap: 25px;
+            }
+            
+            .mega-menu-column {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .mega-menu-category {
+                margin-bottom: 20px;
+                font-weight: 600;
+                color: var(--primary-color);
+                text-transform: uppercase;
+                font-size: 14px;
+                letter-spacing: 0.5px;
+                border-bottom: 1px solid var(--tertiary-color);
+                padding-bottom: 10px;
+            }
+            
+            .mega-menu-links {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .mega-menu-links a {
+                padding: 6px 15px;
+                display: flex;
+                align-items: center;
+                color: var(--text-light, #333);
+                text-decoration: none;
+                transition: background-color 0.2s ease, color 0.2s ease;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 14px;
+            }
+            
+            .mega-menu-links a:hover {
+                background-color: rgba(35, 130, 135, 0.1);
+                color: var(--primary-color, #238287);
+            }
+            
+            .mega-menu-links a img,
+            .mega-menu-links a svg {
+                width: 24px;
+                height: 24px;
+                margin-right: 8px;
+                vertical-align: middle;
+            }
+            
+            .tools-dropdown-btn {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                font-weight: 500;
+                color: var(--primary-color);
+                transition: all 0.2s ease;
+                text-decoration: none;
+            }
+            .tools-dropdown-btn:hover {
+                color: var(--primary-dark);
+                text-decoration: none;
+            }
+            .pdf-tools-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 0.5rem;
+                width: 20px;
+                height: 20px;
+            }
+            .footer { 
+                background-color: var(--primary-color);
+                color: var(--secondary-color);
+                padding: 1.5rem 0;
+                font-size: 14px;
+                margin-top: auto;
+            }
+ 
+            .footer a {
+                color: var(--secondary-color);
+                text-decoration: none;
+                margin: 0 10px;
+                transition: opacity 0.3s ease;
+                font-size: 13px;
+            }
+ 
+            .footer a:hover {
+                opacity: 0.8;
+                text-decoration: underline;
+            }
+ 
+            .footer p {
+                margin-bottom: 0.5rem;
+            }
+ 
+            .footer .social-icons a {
+                font-size: 20px;
+                margin: 0 5px;
+                display: inline-block;
+            }
+ 
+            .footer .footer-links {
+                margin-bottom: 1rem;
+            }
+ 
+            .footer .copyright {
+                font-size: 13px;
+                opacity: 0.8;
+            }
+            
+            /* Button styling */
+            .btn-primary {
+                background-color: var(--primary-color);
+                border-color: var(--primary-color);
+                color: var(--secondary-color);
+            }
+            .btn-primary:hover {
+                background-color: var(--primary-dark);
+                border-color: var(--primary-dark);
+            }
+            .btn-outline-primary {
+                color: var(--primary-color);
+                border-color: var(--primary-color);
+            }
+            .btn-outline-primary:hover {
+                background-color: var(--primary-color);
+                color: var(--secondary-color);
+            }
+            
+            /* Card styling */
+            .card {
+                border: 1px solid var(--tertiary-color);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            .card-title {
+                color: var(--primary-color);
+            }
+            .menu-icon {
+                width: 24px;
+                height: 24px;
+                margin-right: 8px;
+                vertical-align: middle;
+                display: inline-block;
+            }
+
+            /* Responsive styles for mega menu */
+            @media (max-width: 991.98px) {
+                .mega-menu-container {
+                    padding: 20px 15px; /* Reduce padding */
+                    max-height: 75vh; /* Limit height and allow scrolling */
+                    overflow-y: auto;
+                }
+            
+                .mega-menu-grid {
+                    grid-template-columns: 1fr; /* Stack columns vertically */
+                    grid-gap: 20px; /* Adjust gap for vertical layout */
+                }
+            
+                .mega-menu-category {
+                    margin-bottom: 10px; /* Slightly reduce space below category title */
+                    padding-bottom: 8px;
+                }
+            
+                .mega-menu-links {
+                    gap: 10px; /* Reduce gap between links */
+                }
+            
+                .mega-menu-links a {
+                    padding: 8px 10px; /* Adjust padding */
+                    font-size: 15px; 
+                }
+            }
+
+            /* Styles for Upload Section */
+            .upload-section {
+                max-width: 600px; /* Limit width */
+                margin: 2rem auto; /* Center the section */
+            }
+            
+            .select-file-button {
+                /* Using existing btn-primary styles, just ensuring padding/size */
+                padding: 0.8rem 2.5rem;
+                font-size: 1.1rem;
+                cursor: pointer; /* Indicate it's clickable */
+            }
+            
+            .drag-drop-text {
+                color: #6c757d; /* Bootstrap muted color */
+                font-size: 0.9rem;
+            }
         </style>
+        <style>
+        #drop-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            width: 300px;
+            margin: 20px auto;
+        }
+        #file-list {
+            margin-top: 10px;
+        }
+    </style>
     </head>
     <body>
         <header>
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+            <nav class="navbar navbar-light">
                 <div class="container">
-                    <a class="navbar-brand" href="{{ url_for('index') }}">RevisePDF</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('index') }}">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('about') }}">About</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link px-3 dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Tools
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('optimise') }}" title="Compress, repair, or OCR your PDFs">Optimise</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('convert') }}" title="Convert PDFs to or from other formats">Convert</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('edit') }}" title="Edit content, add watermarks, and more">Edit</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('security') }}" title="Secure your PDFs with passwords or digital signatures">Security</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('organise') }}" title="Organise your PDFs by merging, splitting, or reordering pages">Organise</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('creative') }}" title="Add flair to your PDFs with design and customisation tools">Creative</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('accessibility') }}" title="Improve usability and inclusivity for your PDFs">Accessibility</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('developer') }}" title="Advanced tools for developers and professionals">Developer & Professional</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('analysis') }}" title="Analyse and enhance your PDFs with smart tools">Analysis & Utilities</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3" href="{{ url_for('upload') }}">Upload PDF</a>
-                            </li>
-                        </ul>
+                    <div class="navbar-container">
+                        <!-- Logo now added here -->
+                        <div class="logo-placeholder">
+                            <a href="{{ url_for('index') }}">
+                                <img src="{{ url_for('static', filename='img/Group 60.png') }}" alt="RevisePDF Logo" style="height: 100%; width: auto;">
+                            </a>
+                        </div>
+                        
+                        <!-- Title in center - Now clickable -->
+                        <a href="{{ url_for('index') }}" class="title-brand">RevisePDF</a>
+                        
+                        <!-- All PDF Tools dropdown on the right -->
+                        <div class="tools-container">
+                            <a class="tools-dropdown-btn" href="#" id="toolsDropdown" role="button">
+                                <span class="pdf-tools-icon">
+                                    <i class="fas fa-tools"></i>
+                                </span>
+                                All PDF Tools
+                            </a>
+                        </div>
                     </div>
                 </div>
             </nav>
+            
+            <!-- Full Width Mega Menu -->
+            <div class="mega-menu-wrapper" id="megaMenuWrapper">
+                <div class="mega-menu-container">
+                    <div class="mega-menu-grid">
+                        <!-- CONVERT Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">CONVERT TO PDF</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('jpg_to_pdf') }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="menu-icon" viewBox="0 0 16 16">
+                                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707L9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.857 5.784h1.786v.001h.001a.25.25 0 0 1 .238.325l-.068.204-.103.203A.25.25 0 0 1 7.5 6.75h-1a.25.25 0 0 1-.238-.325l.068-.204.103-.203a.25.25 0 0 1 .238-.167zm-.205 1.655a1 1 0 0 1 1.187.748l.317 1.268a1 1 0 0 1-.748 1.188l-1.267.317a1 1 0 0 1-1.188-.748l-.317-1.268a1 1 0 0 1 .748-1.188l1.268-.317zm2.466.327h.75a.25.25 0 0 1 .25.25v2.996a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25V8.016a.25.25 0 0 1 .25-.25zM8.203 11h.75a.25.25 0 0 1 .25.25v.749a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25v-.749a.25.25 0 0 1 .25-.25zm0-5.5h.75a.25.25 0 0 1 .25.25v2.996a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25V5.75a.25.25 0 0 1 .25-.25zm3.322 1.618h.75a.25.25 0 0 1 .25.25v.749a.25.25 0 0 1-.25.25h-.75a.25.25 0 0 1-.25-.25v-.749a.25.25 0 0 1 .25-.25z"/>
+                                    </svg>
+                                    JPG to PDF
+                                </a>
+                                <a href="{{ url_for('word_to_pdf') }}"><img src="{{ url_for('static', filename='img/Compress.svg') }}" alt="Icon">Word to PDF
+                                </a>
+                                <a href="{{ url_for('ppt_to_pdf') }}"><img src="{{ url_for('static', filename='img/Compress.svg') }}" alt="Icon">PowerPoint to PDF</a>
+                                <a href="{{ url_for('excel_to_pdf') }}"><img src="{{ url_for('static', filename='img/Compress.svg') }}" alt="Icon">Excel to PDF</a>
+                                <a href="{{ url_for('html_to_pdf') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="112" height="112" rx="25" fill="#238287"/>
+                                    <rect x="168" y="168" width="112" height="112" rx="25" transform="rotate(-180 168 168)" fill="#238287"/>
+                                    <path d="M73.9009 77.4009C75.8338 77.4008 77.4008 75.8338 77.4009 73.9009L77.4009 42.4009C77.4009 40.4679 75.8338 38.9009 73.9009 38.9009C71.9679 38.9009 70.4009 40.4679 70.4009 42.4009L70.4009 70.4009L42.4009 70.4009C40.4679 70.4009 38.9009 71.9679 38.9009 73.9009C38.9009 75.8338 40.4679 77.4009 42.4009 77.4009L73.9009 77.4009ZM18.5251 23.4749L71.426 76.3757L76.3757 71.426L23.4749 18.5251L18.5251 23.4749Z" fill="white"/>
+                                    <path d="M94 90.5C92.067 90.5 90.5 92.067 90.5 94L90.5 125.5C90.5 127.433 92.067 129 94 129C95.933 129 97.5 127.433 97.5 125.5L97.5 97.5L125.5 97.5C127.433 97.5 129 95.933 129 94C129 92.067 127.433 90.5 125.5 90.5L94 90.5ZM149.376 144.426L96.4749 91.5251L91.5251 96.4749L144.426 149.376L149.376 144.426Z" fill="white"/>
+                                    <line x1="56.3536" y1="98.6464" x2="68.8635" y2="111.156" stroke="#C8C8C8"/>
+                                    <line x1="69.3536" y1="85.6464" x2="81.8635" y2="98.1564" stroke="#C8C8C8"/>
+                                    <line x1="82.3536" y1="70.6464" x2="94.8635" y2="83.1564" stroke="#C8C8C8"/>
+                                    <line x1="94.3536" y1="57.6464" x2="106.864" y2="70.1564" stroke="#C8C8C8"/>
+                                    </svg>HTML to PDF</a>
+                                <a href="{{ url_for('zip_to_pdf') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>ZIP to PDF</a>
+                            </div>
+                        </div>
+                        
+                        <!-- CONVERT FROM Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">CONVERT FROM PDF</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('pdf_to_jpg') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>PDF to JPG</a>
+                                <a href="{{ url_for('pdf_to_word') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>PDF to Word</a>
+                                <a href="{{ url_for('pdf_to_ppt') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">PDF to PowerPoint</a>
+                                <a href="{{ url_for('pdf_to_excel') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">PDF to Excel</a>
+                                <a href="{{ url_for('pdf_to_pdfa') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">PDF to PDF/A</a>
+                                <a href="{{ url_for('pdf_to_panoramic') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">PDF to Panoramic</a>
+                            </div>
+                        </div>
+                        
+                        <!-- OPTIMIZE Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">OPTIMISE</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('compress') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>Compress PDF</a>
+                                <a href="{{ url_for('repair') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>Repair PDF</a>
+                                <a href="{{ url_for('ocr') }}"><svg width="168" height="168" viewBox="0 0 168 168" fill="none" xmlns="http://www.w3.org/2000/svg" class="menu-icon">
+                                    <rect width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect x="90" y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <rect y="90" width="78" height="78" rx="10" fill="#238287"/>
+                                    <path d="M53 55.5C54.3807 55.5 55.5 54.3807 55.5 53L55.5 30.5C55.5 29.1193 54.3807 28 53 28C51.6193 28 50.5 29.1193 50.5 30.5V50.5H30.5C29.1193 50.5 28 51.6193 28 53C28 54.3807 29.1193 55.5 30.5 55.5L53 55.5ZM22.2322 25.7678L51.2322 54.7678L54.7678 51.2322L25.7678 22.2322L22.2322 25.7678Z" fill="white"/>
+                                    <path d="M55.5 114C55.5 112.619 54.3807 111.5 53 111.5L30.5 111.5C29.1193 111.5 28 112.619 28 114C28 115.381 29.1193 116.5 30.5 116.5H50.5V136.5C50.5 137.881 51.6193 139 53 139C54.3807 139 55.5 137.881 55.5 136.5L55.5 114ZM25.7678 144.768L54.7678 115.768L51.2322 112.232L22.2322 141.232L25.7678 144.768Z" fill="white"/>
+                                    <path d="M111.5 53C111.5 54.3807 112.619 55.5 114 55.5L136.5 55.5C137.881 55.5 139 54.3807 139 53C139 51.6193 137.881 50.5 136.5 50.5H116.5V30.5C116.5 29.1193 115.381 28 114 28C112.619 28 111.5 29.1193 111.5 30.5L111.5 53ZM141.232 22.2322L112.232 51.2322L115.768 54.7678L144.768 25.7678L141.232 22.2322Z" fill="white"/>
+                                    <path d="M114 110.5C112.619 110.5 111.5 111.619 111.5 113L111.5 135.5C111.5 136.881 112.619 138 114 138C115.381 138 116.5 136.881 116.5 135.5V115.5H136.5C137.881 115.5 139 114.381 139 113C139 111.619 137.881 110.5 136.5 110.5L114 110.5ZM144.768 140.232L115.768 111.232L112.232 114.768L141.232 143.768L144.768 140.232Z" fill="white"/>
+                                </svg>OCR PDF</a>
+                            </div>
+                        </div>
+                        
+                        <!-- EDIT Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">EDIT</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('page_numbers') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Add Page Numbers</a>
+                                <a href="{{ url_for('add_watermark') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Add Watermark</a>
+                                <a href="{{ url_for('edit_content') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Edit Content</a>
+                            </div>
+                        </div>
+                        
+                        <!-- ORGANIZE Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">ORGANISE</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('merge') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Merge PDFs</a>
+                                <a href="{{ url_for('split') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Split PDF</a>
+                                <a href="{{ url_for('remove') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Remove Pages</a>
+                                <a href="{{ url_for('extract') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Extract Pages</a>
+                                <a href="{{ url_for('sort') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Sort Pages</a>
+                                <a href="{{ url_for('rotate') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Rotate Pages</a>
+                            </div>
+                        </div>
+                        
+                        <!-- SECURITY Column -->
+                        <div class="mega-menu-column">
+                            <div class="mega-menu-category">SECURITY</div>
+                            <div class="mega-menu-links">
+                                <a href="{{ url_for('unlock') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Unlock PDF</a>
+                                <a href="{{ url_for('protect') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Protect PDF</a>
+                                <a href="{{ url_for('sign') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Sign PDF</a>
+                                <a href="{{ url_for('compare') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Compare PDFs</a>
+                                <a href="{{ url_for('redact') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Redact PDF</a>
+                                <a href="{{ url_for('flatten') }}"><img src="{{ url_for('static', filename='img/compress.png') }}" alt="Icon">Flatten PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
         <main>
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-lg-10">
+                    <div class="col-lg-12">
                         {% block content %}
                         {% endblock %}
                     </div>
@@ -69,14 +505,48 @@
             </div>
         </main>
         <footer class="footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <p class="mb-0">&copy; 2025 RevisePDF. All rights reserved</p>
+            <div class="container py-4">
+                <div class="row justify-content-center text-center">
+                    <div class="col-md-8">
+                        <!-- Essential Legal Links -->
+                        <div class="mb-3">
+                            <a href="/privacy">Privacy Policy</a> |
+                            <a href="/terms">Terms of Service</a> |
+                            <a href="/cookies">Cookies Policy</a> |
+                            <a href="/accessibility-statement">Accessibility Statement</a>
+                        </div>
+        
+                        <!-- Short Description -->
+                        <p class="small text-light opacity-75 mb-3">
+                            Quick, hassle-free tools to fix and edit your PDFs.
+                        </p>
+        
+                        <!-- Copyright -->
+                        <p class="small mb-0">&copy; 2025 RevisePDF. All rights reserved.</p>
                     </div>
                 </div>
             </div>
         </footer>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const toolsDropdown = document.getElementById('toolsDropdown');
+                const megaMenuWrapper = document.getElementById('megaMenuWrapper');
+                
+                // Toggle menu on click
+                toolsDropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    megaMenuWrapper.classList.toggle('show');
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!toolsDropdown.contains(e.target) && !megaMenuWrapper.contains(e.target)) {
+                        megaMenuWrapper.classList.remove('show');
+                    }
+                });
+            });
+        </script>
+        {% block scripts %}{% endblock %}
     </body>
 </html>

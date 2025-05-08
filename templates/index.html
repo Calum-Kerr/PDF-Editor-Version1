@@ -1,89 +1,509 @@
 {% extends 'base.html' %}
-{% block title %}RevisePDF - Home{% endblock %}
+{% block title %}RevisePDF - The Ultimate PDF Toolkit{% endblock %}
 {% block content %}
-    <h1>Welcome to RevisePDF!</h1>
-    <p>Revise, edit, and enhance your PDFs with ease.</p>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mt-4">
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Optimise</h5>
-                    <p class="card-text">Compress, repair, or OCR your PDFs.</p>
-                    <a href="{{ url_for('optimise') }}" class="btn btn-primary">View Tools</a>
+    <!-- Hero Section -->
+    <div class="hero-section text-center py-5">
+        <h1 class="display-4 fw-bold">The Ultimate PDF Toolkit for Every Need</h1>
+        <p class="lead text-muted">Optimise, Convert, Edit, Organise, Secure, and More.<br>All in One Place.</p>
+    </div>
+
+    <!-- Tool Navigation and Display -->
+    <div class="tool-navigation-container my-4">
+        <!-- Tab Navigation -->
+        <div class="tool-tabs bg-dark rounded p-3 mb-4">
+            <ul class="nav nav-pills nav-fill" id="pdf-tools-tab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="optimise-tab" data-bs-toggle="tab" data-bs-target="#optimise-content" type="button" role="tab">Optimise</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="convert-tab" data-bs-toggle="tab" data-bs-target="#convert-content" type="button" role="tab">Convert to PDF</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="convert-tab" data-bs-toggle="tab" data-bs-target="#convert-from-content" type="button" role="tab">Convert from PDF</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit-content" type="button" role="tab">Edit</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security-content" type="button" role="tab">Security</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="organise-tab" data-bs-toggle="tab" data-bs-target="#organise-content" type="button" role="tab">Organise</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab Content with Horizontal Scrolling -->
+        <div class="tab-content" id="pdf-tools-content">
+            <!-- Optimise Content -->
+            <div class="tab-pane fade show active" id="optimise-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3 ">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Compress PDF</h5>
+                                <p class="card-text">Reduce the size of your PDF for easier sharing.</p>
+                                <a href="{{ url_for('compress') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Repair PDF</h5>
+                                <p class="card-text">Fix corrupted or damaged PDF files.</p>
+                                <a href="{{ url_for('repair') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">OCR PDF</h5>
+                                <p class="card-text">Extract text from scanned PDFs.</p>
+                                <a href="{{ url_for('ocr') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Convert Content -->
+            <div class="tab-pane fade" id="convert-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3 ">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">JPG to PDF</h5>
+                                <p class="card-text">Combine JPG images into a single PDF file.</p>
+                                <a href="{{ url_for('jpg_to_pdf') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Word to PDF</h5>
+                                <p class="card-text">Transform your Word documents into PDFs.</p>
+                                <a href="{{ url_for('word_to_pdf') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PowerPoint to PDF</h5>
+                                <p class="card-text">Convert PowerPoint presentations to PDF format.</p>
+                                <a href="{{ url_for('ppt_to_pdf') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Excel to PDF</h5>
+                                <p class="card-text">Convert Excel spreadsheets to PDF format.</p>
+                                <a href="{{ url_for('excel_to_pdf') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">HTML to PDF</h5>
+                                <p class="card-text">Convert HTML pages to PDF format.</p>
+                                <a href="{{ url_for('html_to_pdf') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">ZIP to PDF</h5>
+                                <p class="card-text">Convert ZIP archives to PDF format.</p>
+                                <a href="{{ url_for('zip_to_pdf') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Convert</h5>
-                    <p class="card-text">Convert PDFs to or from other formats.</p>
-                    <a href="{{ url_for('convert') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+
+            <!-- Convert From Content -->
+            <div class="tab-pane fade" id="convert-from-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to JPG</h5>
+                                <p class="card-text">Extract high-quality images from your PDF file.</p>
+                                <a href="{{ url_for('pdf_to_jpg') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to Word</h5>
+                                <p class="card-text">Convert PDF files into editable Word documents.</p>
+                                <a href="{{ url_for('pdf_to_word') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to PowerPoint</h5>
+                                <p class="card-text">Convert PDF files into PowerPoint presentations.</p>
+                                <a href="{{ url_for('pdf_to_ppt') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to Excel</h5>
+                                <p class="card-text">Convert PDF files into Excel spreadsheets.</p>
+                                <a href="{{ url_for('pdf_to_excel') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to PDF/A</h5>
+                                <p class="card-text">Convert PDF files to PDF/A format for archiving.</p>
+                                <a href="{{ url_for('pdf_to_pdfa') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">PDF to Panoramic</h5>
+                                <p class="card-text">Convert PDF files into panoramic images.</p>
+                                <a href="{{ url_for('pdf_to_panoramic') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Edit</h5>
-                    <p class="card-text">Edit content, add watermarks, and more.</p>
-                    <a href="{{ url_for('edit') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+
+            <!-- Edit Content -->
+            <div class="tab-pane fade" id="edit-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3 ">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Add Page Numbers</h5>
+                                <p class="card-text">Insert page numbers into your PDF documents.</p>
+                                <a href="{{ url_for('page_numbers') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Add Watermark</h5>
+                                <p class="card-text">Overlay a watermark onto your PDF pages.</p>
+                                <a href="{{ url_for('add_watermark') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Edit Content</h5>
+                                <p class="card-text">Modify text and images in your PDF documents.</p>
+                                <a href="{{ url_for('edit_content') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Organise</h5>
-                    <p class="card-text">Merge, split, sort, and manage your PDFs.</p>
-                    <a href="{{ url_for('organise') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+
+            <!-- Security Content -->
+            <div class="tab-pane fade" id="security-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3 ">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Unlock PDF</h5>
+                                <p class="card-text">Remove password protection from your PDF.</p>
+                                <a href="{{ url_for('unlock') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Protect PDF</h5>
+                                <p class="card-text">Add password protection to your PDF file.</p>
+                                <a href="{{ url_for('protect') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Sign PDF</h5>
+                                <p class="card-text">Add a digital signature to your PDF document.</p>
+                                <a href="{{ url_for('sign') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Compare PDFs</h5>
+                                <p class="card-text">Compare two PDF documents for differences.</p>
+                                <a href="{{ url_for('compare') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Redact PDF</h5>
+                                <p class="card-text">Permanently black out sensitive information from your documents.</p>
+                                <a href="{{ url_for('redact') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Flatten PDF</h5>
+                                <p class="card-text">Flatten PDF layers into a single layer.</p>
+                                <a href="{{ url_for('flatten') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Security</h5>
-                    <p class="card-text">Unlock, protect, sign, and redact PDFs.</p>
-                    <a href="{{ url_for('security') }}" class="btn btn-primary">View Tools</a>
+                </div>
+            </div>
+
+            <!-- Organise Content -->
+            <div class="tab-pane fade" id="organise-content" role="tabpanel">
+                <div class="tools-horizontal-scroll">
+                    <div class="d-flex flex-nowrap overflow-auto pb-3 ">
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Merge PDFs</h5>
+                                <p class="card-text">Combine multiple PDF files into one document.</p>
+                                <a href="{{ url_for('merge') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Split PDF</h5>
+                                <p class="card-text">Separate a PDF into multiple smaller files.</p>
+                                <a href="{{ url_for('split') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Remove Pages</h5>
+                                <p class="card-text">Delete specific pages from your PDF document.</p>
+                                <a href="{{ url_for('remove') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Extract Pages</h5>
+                                <p class="card-text">Extract specific pages as a new PDF document.</p>
+                                <a href="{{ url_for('extract') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Sort Pages</h5>
+                                <p class="card-text">Sort pages in your PDF document.</p>
+                                <a href="{{ url_for('sort') }}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                        <div class="card tool-card me-3">
+                            <div class="card-body">
+                                <div class="tool-icon bg-light rounded p-3 mb-3">
+                                    <!-- Tool icon placeholder -->
+                                </div>
+                                <h5 class="card-title">Rotate Pages</h5>
+                                <p class="card-text">Rotate pages in your PDF to the correct orientation.</p>
+                                <a href="{{ url_for('rotate') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Creative</h5>
-                    <p class="card-text">Design, customise, add flair to your PDFs.</p>
-                    <a href="{{ url_for('creative') }}" class="btn btn-primary">View Tools</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Accessibility</h5>
-                    <p class="card-text">Improve usability and inclusivity for your PDFs.</p>
-                    <a href="{{ url_for('accessibility') }}" class="btn btn-primary">View Tools</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Developer & Professional</h5>
-                    <p class="card-text">Advanced tools for developers and professionals.</p>
-                    <a href="{{ url_for('developer') }}" class="btn btn-primary">View Tools</a>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Analysis & Utilities</h5>
-                    <p class="card-text">Analyse and enhance your PDFs with smart tools.</p>
-                    <a href="{{ url_for('analysis') }}" class="btn btn-primary">View Tools</a>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Why Choose RevisePDF Section -->
+    <div class="why-choose-section py-5">
+        <h2 class="text-center mb-5">Why Choose RevisePDF</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                <div class="card-body text-center">
+                        <h3 class="card-title">Free & Fast</h3>
+                        <p class="card-text">No hidden costs, no sign-ups needed. Just upload your file and get results instantly.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Secure & Private</h3>
+                        <p class="card-text">Your files are processed securely and deleted automatically. We never share your data.</p>
+        </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Accessible Anywhere</h3>
+                        <p class="card-text">Works on any device with a browser. No software installation needed.</p>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional CSS for new layout -->
+    <style>
+        .tool-tabs {
+            background-color: #343a40 !important;
+        }
+        
+        .tool-tabs .nav-link {
+            color: #fff;
+            border-radius: 0;
+            padding: 12px 20px;
+        }
+        
+        .tool-tabs .nav-link.active {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .tool-card {
+            min-width: 250px;
+            max-width: 250px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tools-horizontal-scroll {
+            position: relative;
+            padding-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        /* Remove the arrow */
+        .tools-horizontal-scroll:after {
+            display: none;
+        }
+        
+        /* Why Choose section styling */
+        .why-choose-section .card {
+            border-width: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .why-choose-section .card:hover {
+            transform: scale(1.03);
+        }
+
+        /* Responsive styles for tool tabs */
+        @media (max-width: 767.98px) {
+            .tool-tabs .nav-pills {
+                flex-wrap: nowrap; /* Prevent wrapping */
+                overflow-x: auto;  /* Enable horizontal scrolling */
+                justify-content: flex-start; /* Align items to start */
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+            .tool-tabs .nav-pills::-webkit-scrollbar { 
+                display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+            }
+            .tool-tabs .nav-item {
+                flex-shrink: 0; /* Prevent items from shrinking */
+            }
+            .tool-tabs .nav-link {
+                white-space: nowrap; /* Keep text on one line */
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap tabs
+        var tabElms = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabElms.forEach(function(tabEl) {
+            new bootstrap.Tab(tabEl);
+        });
+    });
+</script>
 {% endblock %}

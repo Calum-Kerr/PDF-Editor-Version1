@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Compare PDFs - RevisePDF{% endblock %}
+
 {% block content %}
-    <h1>Compare PDFs</h1>
-    <p>Compare the content of two PDF files.</p>
+<div class="upload-section text-center">
+    <h1 class="mb-3">Compare PDFs</h1>
+    <p class="mb-4">Compare the content of two PDF files.</p>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-3">
+        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required multiple>
+        <label for="fileInput" class="btn btn-primary select-file-button">
+            Select files (2)
+        </label>
+    </form>
+
+    <p class="drag-drop-text mt-2">or drag and drop here</p>
+    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
+        Drop files here
+    </div>
+</div>
 {% endblock %}
