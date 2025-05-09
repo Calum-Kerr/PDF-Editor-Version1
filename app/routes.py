@@ -10,6 +10,11 @@ from tools.security.flatten import flatten_pdf
 from app import app
 from app.errors import PDFProcessingError
 
+# Configure upload folder
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+# Ensure the upload folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 from tools.convert.jpg_to_pdf import jpg_to_pdf_view
 from tools.optimise.compress import compress_view
 from tools.convert.pdf_to_panoramic import pdf_to_panoramic_view
@@ -19,6 +24,10 @@ from tools.organise.rotate import rotate_view
 from tools.security.flatten import flatten_pdf
 from tools.security.unlock import unlock_pdf  # Import the existing unlock function
 from tools.edit.page_numbers import add_page_numbers, get_font_name, get_position_name
+from tools.security.redact import redact_view
+
+import fitz
+import difflib
 
 #------------------------- Main Pages -------------------------
 
@@ -351,14 +360,9 @@ def unlock():
             return jsonify({'error': 'Please upload a PDF file'})
             
         try:
-            # Create input stream from uploaded file
             input_stream = BytesIO(file.read())
-            
-            # Use the unlock_pdf function
             try:
                 output_stream = unlock_pdf(input_stream, password)
-                
-                # Send the unlocked PDF back to the user
                 return send_file(
                     output_stream,
                     mimetype='application/pdf',
@@ -367,11 +371,8 @@ def unlock():
                 )
             finally:
                 input_stream.close()
-                
-        except PDFProcessingError as e:
-            return jsonify({'error': str(e)})
         except Exception as e:
-            return jsonify({'error': f"An unexpected error occurred: {str(e)}"})
+            return jsonify({'error': f"An error occurred: {str(e)}"})
             
     return render_template('pages/security/unlock.html')
 
@@ -385,65 +386,184 @@ def protect():
         if file.filename == '':
             return jsonify({'error': 'No file selected'})
 
-        # Get form data
         user_password = request.form.get('user_password')
         owner_password = request.form.get('owner_password')
         
         if not all([user_password, owner_password]):
-            return jsonify({'error': 'Passwords are required'})
+            return jsonify({'error': 'Both passwords are required'})
 
         if not file.filename.lower().endswith('.pdf'):
             return jsonify({'error': 'Please upload a PDF file'})
-
-        try:
-            # Read the uploaded file into memory
-            pdf_data = BytesIO(file.read())
             
-            # Create a temporary file for the output
-            output_pdf = BytesIO()
+        try:
+            # Create temporary files
+            temp_input = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            temp_output = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+            
+            file.save(temp_input.name)
             
             # Protect the PDF
             protect_pdf(
-                input_stream=pdf_data,
-                output_stream=output_pdf,
+                temp_input.name,
+                temp_output.name,
                 user_password=user_password,
                 owner_password=owner_password
             )
             
-            # Seek to the beginning of the output stream
-            output_pdf.seek(0)
-            
-            # Prepare the response
-            response = send_file(
-                output_pdf,
+            return send_file(
+                temp_output.name,
                 mimetype='application/pdf',
                 as_attachment=True,
                 download_name=f"protected_{secure_filename(file.filename)}"
             )
             
-            # Add headers to prevent caching
-            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-            response.headers["Pragma"] = "no-cache"
-            response.headers["Expires"] = "0"
-            
-            return response
-
         except Exception as e:
-            app.logger.error(f"Error protecting PDF: {str(e)}")
             return jsonify({'error': f"Error protecting PDF: {str(e)}"})
-
+            
     return render_template('pages/security/protect.html')
 
-@app.route('/pages/security/sign')
+@app.route('/pages/security/sign', methods=['GET', 'POST'])
 def sign():
+    if request.method == 'POST':
+        # Add your sign logic here
+        pass
     return render_template('pages/security/sign.html')
 
-@app.route('/pages/security/compare')
+@app.route('/pages/security/compare', methods=['GET', 'POST'])
 def compare():
+    if request.method == 'POST':
+        if 'pdf1' not in request.files or 'pdf2' not in request.files:
+            return render_template('pages/security/compare.html', 
+                                 error="Please upload both PDF files")
+
+        pdf1 = request.files['pdf1']
+        pdf2 = request.files['pdf2']
+        
+        if pdf1.filename == '' or pdf2.filename == '':
+            return render_template('pages/security/compare.html',
+                                 error="No files selected")
+
+        if not pdf1.filename.lower().endswith('.pdf') or not pdf2.filename.lower().endswith('.pdf'):
+            return render_template('pages/security/compare.html',
+                                 error="Please upload PDF files only")
+        
+        try:
+            # Save files temporarily
+            temp_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'temp')
+            os.makedirs(temp_dir, exist_ok=True)
+            
+            pdf1_path = os.path.join(temp_dir, secure_filename(pdf1.filename))
+            pdf2_path = os.path.join(temp_dir, secure_filename(pdf2.filename))
+            
+            pdf1.save(pdf1_path)
+            pdf2.save(pdf2_path)
+            
+            # Store paths in session for later retrieval
+            session['pdf1_path'] = pdf1_path
+            session['pdf2_path'] = pdf2_path
+            
+            # Compare PDFs
+            doc1 = fitz.open(pdf1_path)
+            doc2 = fitz.open(pdf2_path)
+            
+            differences = []
+            matching_pages = 0
+            different_pages = 0
+            
+            max_pages = min(doc1.page_count, doc2.page_count)
+            
+            for page_num in range(max_pages):
+                # Extract text from both pages
+                text1 = doc1[page_num].get_text()
+                text2 = doc2[page_num].get_text()
+                
+                # Compare texts
+                if text1 != text2:
+                    different_pages += 1
+                    # Get detailed differences using difflib
+                    diff = difflib.unified_diff(
+                        text1.splitlines(keepends=True),
+                        text2.splitlines(keepends=True)
+                    )
+                    
+                    # Store difference information
+                    differences.append({
+                        'page': page_num + 1,
+                        'description': f"Text content differs",
+                        'diff': list(diff)
+                    })
+                else:
+                    matching_pages += 1
+            
+            # Check if documents have different number of pages
+            if doc1.page_count != doc2.page_count:
+                differences.append({
+                    'page': min(doc1.page_count, doc2.page_count) + 1,
+                    'description': f"Document length differs: PDF1 has {doc1.page_count} pages, PDF2 has {doc2.page_count} pages"
+                })
+            
+            doc1.close()
+            doc2.close()
+            
+            comparison_result = {
+                'matching_pages': matching_pages,
+                'different_pages': different_pages,
+                'differences': differences
+            }
+            
+            return render_template('pages/security/compare.html',
+                                 comparison_result=comparison_result,
+                                 show_viewer=True)
+                                 
+        except Exception as e:
+            return render_template('pages/security/compare.html',
+                                 error=f"Error comparing PDFs: {str(e)}")
+            
     return render_template('pages/security/compare.html')
 
-@app.route('/pages/security/redact')
+@app.route('/get_pdf1')
+def get_pdf1():
+    if 'pdf1_path' in session:
+        return send_file(session['pdf1_path'])
+    return '', 404
+
+@app.route('/get_pdf2')
+def get_pdf2():
+    if 'pdf2_path' in session:
+        return send_file(session['pdf2_path'])
+    return '', 404
+
+@app.route('/pages/security/redact', methods=['GET', 'POST'])
 def redact():
+    if request.method == 'POST':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return redact_view()
+        else:
+            # Handle regular form submission
+            if 'file' not in request.files:
+                return render_template('pages/security/redact.html', error="No file selected")
+            
+            file = request.files['file']
+            if file.filename == '':
+                return render_template('pages/security/redact.html', error="No file selected")
+                
+            if not file.filename.lower().endswith('.pdf'):
+                return render_template('pages/security/redact.html', error="Please upload a PDF file")
+                
+            try:
+                # Save file temporarily
+                filename = secure_filename(file.filename)
+                temp_dir = tempfile.gettempdir()
+                temp_path = os.path.join(temp_dir, f"redact_{filename}")
+                file.save(temp_path)
+                
+                return render_template('pages/security/redact.html', 
+                                     pdf_path=temp_path.replace('\\', '/'),
+                                     filename=filename)
+            except Exception as e:
+                return render_template('pages/security/redact.html', 
+                                     error=f"Error processing file: {str(e)}")
+                
     return render_template('pages/security/redact.html')
 
 @app.route('/pages/security/flatten', methods=['GET', 'POST'])

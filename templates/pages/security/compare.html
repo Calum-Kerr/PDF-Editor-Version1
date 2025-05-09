@@ -2,20 +2,234 @@
 {% block title %}Compare PDFs - RevisePDF{% endblock %}
 
 {% block content %}
-<div class="upload-section text-center">
-    <h1 class="mb-3">Compare PDFs</h1>
-    <p class="mb-4">Compare the content of two PDF files.</p>
-
-    <form method="POST" enctype="multipart/form-data" class="mb-3">
-        <input type="file" name="fileInput" id="fileInput" class="d-none" accept=".pdf" required multiple>
-        <label for="fileInput" class="btn btn-primary select-file-button">
-            Select files (2)
-        </label>
-    </form>
-
-    <p class="drag-drop-text mt-2">or drag and drop here</p>
-    <div id="drop-zone" style="border: 2px dashed #ccc; padding: 20px; display: none;">
-        Drop files here
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h1>Compare PDFs</h1>
+        <p class="text-muted">Compare two PDF files side by side and highlight their differences</p>
     </div>
+
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">First PDF</label>
+                            <input type="file" name="pdf1" class="form-control" accept=".pdf" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Second PDF</label>
+                            <input type="file" name="pdf2" class="form-control" accept=".pdf" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Compare PDFs
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if comparison_result %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h3>Comparison Results</h3>
+            <div class="mb-4">
+                <p><strong>Matching pages:</strong> {{ comparison_result.matching_pages }}</p>
+                <p><strong>Different pages:</strong> {{ comparison_result.different_pages }}</p>
+            </div>
+
+            {% if show_viewer %}
+            <div class="pdf-viewer-container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="pdf-container" id="pdf1Container">
+                            <h4>First PDF</h4>
+                            <div class="pdf-controls mb-2">
+                                <button class="btn btn-sm btn-outline-primary prev-page" data-container="pdf1">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="mx-2">Page <span class="current-page">1</span> of <span class="total-pages">-</span></span>
+                                <button class="btn btn-sm btn-outline-primary next-page" data-container="pdf1">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <canvas id="pdf1Canvas" class="pdf-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="pdf-container" id="pdf2Container">
+                            <h4>Second PDF</h4>
+                            <div class="pdf-controls mb-2">
+                                <button class="btn btn-sm btn-outline-primary prev-page" data-container="pdf2">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="mx-2">Page <span class="current-page">1</span> of <span class="total-pages">-</span></span>
+                                <button class="btn btn-sm btn-outline-primary next-page" data-container="pdf2">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <canvas id="pdf2Canvas" class="pdf-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="differences-list mt-4">
+                <h4>Differences Found</h4>
+                {% if comparison_result.differences %}
+                <ul class="list-group">
+                    {% for diff in comparison_result.differences %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>
+                                <i class="fas fa-exclamation-circle text-danger"></i>
+                                Page {{ diff.page }}: {{ diff.description }}
+                            </span>
+                            <button class="btn btn-sm btn-outline-primary goto-page" data-page="{{ diff.page }}">
+                                Go to Page
+                            </button>
+                        </div>
+                        {% if diff.diff %}
+                        <pre class="mt-2"><code>{{ diff.diff|join('') }}</code></pre>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No differences found between the PDFs.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+.pdf-viewer-container {
+    margin-top: 20px;
+}
+
+.pdf-container {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.pdf-canvas {
+    width: 100%;
+    border: 1px solid #ddd;
+    margin-top: 10px;
+}
+
+.pdf-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.differences-highlight {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.2);
+    pointer-events: none;
+}
+</style>
+
+{% if show_viewer %}
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+
+class PDFViewer {
+    constructor(containerId, pdfUrl) {
+        this.container = document.getElementById(containerId);
+        this.canvas = this.container.querySelector('canvas');
+        this.currentPage = 1;
+        this.totalPages = 0;
+        this.pdfDoc = null;
+        this.pdfUrl = pdfUrl;
+        
+        this.init();
+    }
+
+    async init() {
+        try {
+            this.pdfDoc = await pdfjsLib.getDocument(this.pdfUrl).promise;
+            this.totalPages = this.pdfDoc.numPages;
+            this.container.querySelector('.total-pages').textContent = this.totalPages;
+            this.renderPage(1);
+        } catch (error) {
+            console.error('Error loading PDF:', error);
+        }
+    }
+
+    async renderPage(pageNum) {
+        try {
+            const page = await this.pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            
+            this.canvas.height = viewport.height;
+            this.canvas.width = viewport.width;
+            
+            const renderContext = {
+                canvasContext: this.canvas.getContext('2d'),
+                viewport: viewport
+            };
+            
+            await page.render(renderContext).promise;
+            this.currentPage = pageNum;
+            this.container.querySelector('.current-page').textContent = pageNum;
+        } catch (error) {
+            console.error('Error rendering page:', error);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('pdf1Container')) {
+        const viewer1 = new PDFViewer('pdf1Container', '{{ url_for("get_pdf1") }}');
+        const viewer2 = new PDFViewer('pdf2Container', '{{ url_for("get_pdf2") }}');
+
+        // Navigation buttons
+        document.querySelectorAll('.prev-page').forEach(button => {
+            button.addEventListener('click', function() {
+                const viewer = this.dataset.container === 'pdf1' ? viewer1 : viewer2;
+                if (viewer.currentPage > 1) {
+                    viewer.renderPage(viewer.currentPage - 1);
+                }
+            });
+        });
+
+        document.querySelectorAll('.next-page').forEach(button => {
+            button.addEventListener('click', function() {
+                const viewer = this.dataset.container === 'pdf1' ? viewer1 : viewer2;
+                if (viewer.currentPage < viewer.totalPages) {
+                    viewer.renderPage(viewer.currentPage + 1);
+                }
+            });
+        });
+
+        // Go to page buttons
+        document.querySelectorAll('.goto-page').forEach(button => {
+            button.addEventListener('click', function() {
+                const pageNum = parseInt(this.dataset.page);
+                viewer1.renderPage(pageNum);
+                viewer2.renderPage(pageNum);
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endif %}
 {% endblock %}

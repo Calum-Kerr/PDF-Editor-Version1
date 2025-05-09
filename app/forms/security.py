@@ -5,4 +5,10 @@ class ProtectPDFForm(FlaskForm):
     class Meta:
         csrf = False
     
-    # Your form fields here...
+    user_password = PasswordField('User Password')
+    owner_password = PasswordField('Owner Password')
+    submit = SubmitField('Protect PDF')
+
+class ComparePDFForm:
+    """Simple form class without CSRF protection"""
+    pass
